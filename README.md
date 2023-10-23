@@ -1,3 +1,8 @@
+(Still working on)
+
+A smart assistant called "Joan". Being developed purposly for running on low resource systems, such as a raspberry pi. Uses machine learningk (scikit-lear) rather than chatbot frameworks (such as tensorflow, chatterbot, etc.), which is much faster and allows for more control over how the assistant works.
+
+
 ###Tags used in the responses.csv file###
 #tag bewteen left and right arrow symbol
 
