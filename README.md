@@ -1,4 +1,5 @@
 ###Tags used in the responses.csv file###
+
 <user-name>      can include the user's name
 <date>           Includes the date whether that is current date or some other date
 <emotion>        a type of emotion
