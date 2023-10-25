@@ -1,7 +1,9 @@
 (Still working on)
 
-A smart assistant called "Joan". Being developed purposly for running on low resource systems, such as a raspberry pi. Uses machine learningk (scikit-lear) rather than chatbot frameworks (such as tensorflow, chatterbot, etc.), which is much faster and allows for more control over how the assistant works.
+A smart assistant called "Joan". Being developed purposly for running on low resource systems, such as a raspberry pi. Uses machine learning (scikit-learn) rather than chatbot frameworks (such as tensorflow, chatterbot, etc.), which is much faster and allows for more control over how the assistant works.
 
+In addition to the machine leaning it also uses several different APIs and more to come. A major API used is wolfram alpha which is used to respond to the users input when "Joan" doesn't have a response for it (which is slowly becoming less likely).
+It also uses accuweather api to get weather data from five days in advanced.
 
 ###Tags used in the responses.csv file###
 #tag bewteen left and right arrow symbol
