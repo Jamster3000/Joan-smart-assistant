@@ -306,9 +306,9 @@ def factory_reset():
     chatbot_tools.restart_program()
 
 def current_weather():
+    user_data = chatbot_tools.get_user_data()
     internet = check_internet()
     if internet == 0:
-        user_data = chatbot_tools.get_user_data()
         location_key = user_data['location key']
     
         url = f"http://dataservice.accuweather.com/currentconditions/v1/{location_key}?apikey={weather_api_key}&details=true"
@@ -359,7 +359,50 @@ def weather_tomorrow():
             print(chatbot_tools.random_output('unaccessable weather').replace('<user-name>', user_data['first name']))
     else:
         print(chatbot_tools.random_output('no internet').replace('<user-name>', user_data['first name']))
+
+def weather_for_area(place):
+    user_data = chatbot_tools.get_user_data()
+    internet = check_internet()
+    location_key = ''
+    
+    if internet == 0:
+        weather_api_key = 'F7DxhfQx1EoPuopgN59Tq0OkGRJwVkWQ'
+
+        # AccuWeather API endpoint for location search
+        url = f"http://dataservice.accuweather.com/locations/v1/cities/search"
+
+        # Parameters for the API request
+        params = {
+            'apikey': weather_api_key,
+            'q': place,
+        }
+
+        # Make the API request
+        response = requests.get(url, params=params)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            data = response.json()
+    
+            # Assuming you want the first result
+            if data:
+                location_key = data[0]['Key']    
+       
+        # Get the weather from the location specified
+        url = f"http://dataservice.accuweather.com/currentconditions/v1/{location_key}?apikey={weather_api_key}&details=true"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
         
+            current_weather = data[0]['WeatherText']
+            current_temperature = str(data[0]['Temperature']['Metric']['Value'])
+
+            print(f"The current weather in {place} is {current_weather} and the temperature is {current_temperature} celsius")
+        else:
+            print(chatbot_tools.random_output('unaccessable weather').replace('<user-name>', user_data['first name']))
+    else:
+        print(chatbot_tools.random_output('no internet').replace('<user-name>', user_data['first name']))
+
 def weather_day(day):
     user_data = chatbot_tools.get_user_data()
     internet = check_internet()

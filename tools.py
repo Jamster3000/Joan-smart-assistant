@@ -302,16 +302,22 @@ def check_internet():
         return 1
     
 def get_ip_address():
+    '''
+    Gets the user's device IP address
+    '''
     response = requests.get('https://api64.ipify.org?format=json').json()
     return response['ip']
 
 def get_location_key():
+    '''
+    Gets the location key from accuweather api which uses the user's IP address
+    '''
     weather_api_key = 'F7DxhfQx1EoPuopgN59Tq0OkGRJwVkWQ'
     user_data = chatbot_tools.get_user_data()
     city = user_data['city']
     
     # Define the city you want to get the location key for
-    city_name = 'Barnsley'  # Replace with your desired city
+    city_name = city  # Replace with your desired city
 
     # AccuWeather API endpoint for location search
     url = f"http://dataservice.accuweather.com/locations/v1/cities/search"
@@ -337,6 +343,9 @@ def get_location_key():
         pass
 
 def get_ip_data():
+    '''
+    Gets data from the IP address including city and country the user's device is in
+    '''
     internet = check_internet()
     if internet == 0:
         ip_address = get_ip_address()#get the device ip address

@@ -620,9 +620,14 @@ class models():
                     user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('plot', '').replace('of', '').rstrip().lstrip().title()
                     movie.collect_data(user_input, movie.plot)
                 elif entity == 'languages':
-                    pass
+                    user_input = user_input.replace('what', '').replace('languages', '').replace('language', '').replace('in', '').repalce('are', '').rstrip().lstrip().title()
+                    movie.collect_data(user_input, movie.languages)
                 elif entity == 'awards':
-                    pass
+                    user_input = user_input.replace('what', '').replace('award', '').replace('awards', '').replace('did', '').replace('win', '').rstrip().lstrip().title()
+                    movie.collect_data(user_input, movie.awards)
+                elif entity == 'specific weather location':
+                    user_input = user_input.split('for ')
+                    weather_for_area(user_input[1])
                 else:
                     chatbot_tools.big_guns(user_input)
   
@@ -721,8 +726,6 @@ while run_loop is True:
 ###for any code that is temp search for ***
 #TODO: Need to add bot birthday output once completed, including it's age
 #TODO: Need to be able to ask the user questions about themselves
-#TODO: Need to finish with the movies, outputting the correct info about movies
 #TODO: Work on the list of all the other apis in the other downloaded file
 #TODO: Ask it what the weather is like for X place 
 #TODO: Get it to cache the wolfram alpha outputs meaning that this bot can learn new inputs/outputs without the need to call on wolfram alpha, do not cache math questions
-

@@ -210,3 +210,9 @@
 2023-11-14 08:49:29.593592: Time taken to preprocess data: 0.8712358474731445
 2023-11-14 09:03:17.674251: All libraries imported. Time taken... 3.3468151092529297
 2023-11-14 09:03:17.674251: Time taken to preprocess data: 1.3548614978790283
+2023-11-14 11:07:50.006087: All libraries imported. Time taken... 3.783916711807251
+2023-11-14 11:07:50.006087: Time taken to preprocess data: 1.3612840175628662
+2023-11-14 11:14:57.714598: All libraries imported. Time taken... 3.3876559734344482
+2023-11-14 11:14:57.714598: Time taken to preprocess data: 1.329432487487793
+2023-11-14 11:15:52.101807: All libraries imported. Time taken... 3.2753944396972656
+2023-11-14 11:15:52.101807: Time taken to preprocess data: 1.3390493392944336
