@@ -471,78 +471,80 @@ class movie():
                     data = response.json()
                 
                     #usful data elements
-                    title = data['Search'][0]['Title'].title()#TODO: This returns an error, need to deal with it
-                    year = data['Search'][0]['Year']
-                    ID = data['Search'][0]['imdbID']
-                    file_type = data['Search'][0]['Type']
-                    image_url = data['Search'][0]['Poster']
+                    try:
+                        title = data['Search'][0]['Title'].title()#TODO: This returns an error, need to deal with it
+                        year = data['Search'][0]['Year']
+                        ID = data['Search'][0]['imdbID']
+                        file_type = data['Search'][0]['Type']
+                        image_url = data['Search'][0]['Poster']
         
-                    #call for addional detail using the id
-                    url = f"https://www.omdbapi.com/?apikey=32486892&i={ID}"
-                    detailed_response = requests.get(url)
+                        #call for addional detail using the id
+                        url = f"https://www.omdbapi.com/?apikey=32486892&i={ID}"
+                        detailed_response = requests.get(url)
         
-                    if detailed_response.status_code == 200:
-                        data = detailed_response.json()
+                        if detailed_response.status_code == 200:
+                            data = detailed_response.json()
 
-                        rated = data['Rated']
-                        released = data['Released']
-                        runtime = data['Runtime']
-                        genre = data['Genre']
-                        director = data['Director']
-                        writer = data['Writer']
-                        actors = data['Actors']
-                        plot = data['Plot']
-                        languages = data['Language']
-                        awards = data['Awards']
+                            rated = data['Rated']
+                            released = data['Released']
+                            runtime = data['Runtime']
+                            genre = data['Genre']
+                            director = data['Director']
+                            writer = data['Writer']
+                            actors = data['Actors']
+                            plot = data['Plot']
+                            languages = data['Language']
+                            awards = data['Awards']
 
-                        for rating in data['Ratings']:
-                            if rating['Source'] == 'Rotten Tomatoes':
-                                rate = rating['Value']
+                            for rating in data['Ratings']:
+                                if rating['Source'] == 'Rotten Tomatoes':
+                                    rate = rating['Value']
             
-                        try:
-                            #reads currently collected data
-                            with open('data/movie data.json', 'r') as f:
-                                movie_data = json.load(f)
-                        except:
-                            pass
+                            try:
+                                #reads currently collected data
+                                with open('data/movie data.json', 'r') as f:
+                                    movie_data = json.load(f)
+                            except:
+                                pass
             
-                        #writes data to a dictionary
-                        collected_data = {
-                            "Year": released,
-                            "rated": rated,
-                            "runTime": runtime,
-                            "genre": genre,
-                            "director": director,
-                            "writer": writer,
-                            "actors": actors,
-                            "plot": plot,
-                            "languages": languages,
-                            "awards": awards,
-                            "rate": rate}
+                            #writes data to a dictionary
+                            collected_data = {
+                                "Year": released,
+                                "rated": rated,
+                                "runTime": runtime,
+                                "genre": genre,
+                                "director": director,
+                                "writer": writer,
+                                "actors": actors,
+                                "plot": plot,
+                                "languages": languages,
+                                "awards": awards,
+                                "rate": rate}
             
-                        movie_data[title] = collected_data
+                            movie_data[title] = collected_data
             
-                        #writes all previous and new data to file
-                        with open('data/movie data.json', 'w') as f:
-                            json.dump(movie_data, f, indent=4)
-                else:
-                    print(response.status_code)
-                print(function(user_input))
+                            #writes all previous and new data to file
+                            with open('data/movie data.json', 'w') as f:
+                                json.dump(movie_data, f, indent=4)
+                        else:
+                            print(response.status_code)
+                        print(function(user_input))
+                    except KeyError:
+                        pass                  
             else:
                 print(chatbot_tools.random_output('no internet'))
 
     def release(user_input):
-        user_input = user_input.title().lstrip().rstrip()
+        user_input = user_input.title().lstrip().rstrip().replace(' D', '')
     
         try:
             movie_data = movie.read_movie_data()    
-            
-    
             movie_data = movie_data[user_input]
             return (f"{user_input} was released in {movie_data['Year']}")
         except KeyError:
-            chatbot_tools.big_guns(user_input)
-            return ''
+            movie_data = movie.read_movie_data()    
+            movie_data = movie_data["The " + user_input]
+            print(f"The {user_input} was released in {movie_data['Year']}")
 
     def rate(user_input):
         try:
@@ -552,8 +554,11 @@ class movie():
                 movie_data = data[user_input]
                 return(f"{user_input} is rated {movie_data['rated']}")
         except KeyError:
-            chatbot_tools.big_guns(user_input)
-            return ''
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+            
+                movie_data = data["The " + user_input]
+                print(f"The {user_input} is rated {movie_data['rated']}")
         
     def runtime(user_input):
         try:
@@ -563,8 +568,11 @@ class movie():
                 movie_data = data[user_input]
                 return f"{user_input} runs for {movie_data['runTime'].replace('min', 'minutes')}"
         except KeyError:
-            chatbot_tools.big_guns(user_input)
-            return ''
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+            
+                movie_data = data["The " + user_input]
+                print(f"The {user_input} runs for {movie_data['runTime'].replace('min', 'minutes')}")
     
     def genre(user_input):
         try:
@@ -574,8 +582,11 @@ class movie():
                 movie_data = data[user_input]
                 return f"The genre for {user_input} is {movie_data['genre']}"
         except KeyError:
-            chatbot_tools.big_guns(user_input)
-            return ''
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data["The " + user_input]
+                print(f"The genre for The {user_input} is {movie_data['genre']}")
      
     def director(user_input):
         try:
@@ -587,8 +598,13 @@ class movie():
                 directors = ", ".join(list_of_directors[:-1]) + " and " + list_of_directors[-1]
                 return f"The directors for {user_input} are {directors}"
         except KeyError:
-            chatbot_tools.big_guns(user_input)
-            return ''
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data["The " + user_input]
+                list_of_directors = movie_data['director'].split(', ')
+                directors = ", ".join(list_of_directors[:-1]) + " and " + list_of_directors[-1]
+                print(f"The directors for The {user_input} are {directors}")
         
     def writer(user_input):
         try:
@@ -600,11 +616,15 @@ class movie():
                 writers = ", ".join(list_of_writer[:-1]) + " and " + list_of_writer[-1]
                 return f"The directors for {user_input} are {writers}"
         except KeyError:
-            chatbot_tools.big_guns(user_input)
-            return ''
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data["The " + user_input]
+                list_of_writer = movie_data['writer'].split(', ')
+                writers = ", ".join(list_of_writer[:-1]) + " and " + list_of_writer[-1]
+                print(f"The directors for The {user_input} are {writers}")
                                       
     def actor(user_input):
-        print('running')
         try:
             with open('data/movie data.json', 'r') as f:
                 data = json.load(f)
@@ -613,9 +633,61 @@ class movie():
                 list_of_actors = movie_data['actors'].split(', ')
                 actors = ", ".join(list_of_actors[:-1]) + " and " + list_of_actors[-1]
                 return f"The actors for {user_input} are {actors}"
-        except KeyError:
-            print('ahh')
-            #chatbot_tools.big_guns(user_input)
-            return ''
         except Exception as e:
-            print(e)
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data["The " + user_input]
+                list_of_actors = movie_data['actors'].split(', ')
+                actors = ", ".join(list_of_actors[:-1]) + " and " + list_of_actors[-1]
+                print(f"The actors for The {user_input} are {actors}")
+            
+    def plot(user_input):
+        try:
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data[user_input]
+                plot = movie_data['plot']
+                return f"The plot of {user_input} is: {plot}"
+        except KeyError:
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data["The " + user_input]
+                plot = movie_data['plot']
+                return f"The plot of The {user_input} is: {plot}"
+    
+    def languages(user_input):
+        try:
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data[user_input]
+                list_of_languages = movie_data['languages'].split(', ')
+                languages = ", ".join(list_of_languages[:-1]) + " and " + list_of_languages[-1]
+                return f"The languages for {user_input} are {languages}"
+        except KeyError:
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data["The " + user_input]
+                list_of_languages = movie_data['languages'].split(', ')
+                languages = ", ".join(list_of_languages[:-1]) + " and " + list_of_languages[-1]
+                print(f"The languages for The {user_input} are {languages}")
+    
+    def awards(user_input):
+        try:
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data[user_input]
+                awards = movie_data['awards']
+                return f"The awards for {user_input} is: {awards}"
+        except KeyError:
+            with open('data/movie data.json', 'r') as f:
+                data = json.load(f)
+                
+                movie_data = data["The " + user_input]
+                awards = movie_data['awards']
+                print(f"The awards for The {user_input} is: {awards}")

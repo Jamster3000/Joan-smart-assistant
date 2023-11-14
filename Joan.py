@@ -580,7 +580,7 @@ class models():
                 elif entity == 'year':
                     tell_year()
                 elif entity == 'movie release':
-                    user_input = user_input.lower().lstrip().replace('when', '').replace('did', '').replace('release', '')
+                    user_input = user_input.lower().lstrip().replace('when', '').replace('did', '').replace('release', '').replace('released', '').replace('was', '')
                     movie.collect_data(user_input, movie.release)
                 elif entity == 'weather monday':
                     weather_day('monday')
@@ -613,9 +613,16 @@ class models():
                 elif entity == 'movie writer':
                     user_input = user_input.replace('who', '').replace('wrote', '').replace('is', '').replace('writer', '').replace('for', '')
                     movie.collect_data(user_input, movie.writer)
-                elif entity == 'movie actor':#TODO: Not working.
-                    user_input = user_input.replace('actors', '').replace('acted', '').replace('for', '').replace('who', '').replace('in', '').replace('actor', '')
+                elif entity == 'movie actor':
+                    user_input = user_input.replace('actors', '').replace('acted', '').replace('for', '').replace('who', '').replace('in', '').replace('actor', '').replace('is', '').replace('the', '')
                     movie.collect_data(user_input, movie.actor)
+                elif entity == 'movie plot':
+                    user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('plot', '').replace('of', '').rstrip().lstrip().title()
+                    movie.collect_data(user_input, movie.plot)
+                elif entity == 'languages':
+                    pass
+                elif entity == 'awards':
+                    pass
                 else:
                     chatbot_tools.big_guns(user_input)
   

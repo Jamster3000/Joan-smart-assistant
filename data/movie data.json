@@ -11,5 +11,31 @@
         "languages": "English, Turkish",
         "awards": "Nominated for 1 Oscar. 72 wins & 67 nominations total",
         "rate": "96%"
+    },
+    "The Terminator": {
+        "Year": "26 Oct 1984",
+        "rated": "R",
+        "runTime": "107 min",
+        "genre": "Action, Sci-Fi",
+        "director": "James Cameron",
+        "writer": "James Cameron, Gale Anne Hurd, William Wisher",
+        "actors": "Arnold Schwarzenegger, Linda Hamilton, Michael Biehn",
+        "plot": "A human soldier is sent from 2029 to 1984 to stop an almost indestructible cyborg killing machine, sent from the same year, which has been programmed to execute a young woman whose unborn son is the key to humanity's future salvat...",
+        "languages": "English, Spanish",
+        "awards": "8 wins & 7 nominations",
+        "rate": "100%"
+    },
+    "Terminator 2: Judgment Day": {
+        "Year": "03 Jul 1991",
+        "rated": "R",
+        "runTime": "137 min",
+        "genre": "Action, Sci-Fi",
+        "director": "James Cameron",
+        "writer": "James Cameron, William Wisher",
+        "actors": "Arnold Schwarzenegger, Linda Hamilton, Edward Furlong",
+        "plot": "A cyborg, identical to the one who failed to kill Sarah Connor, must now protect her ten year old son John from an even more advanced and powerful cyborg.",
+        "languages": "English, Spanish",
+        "awards": "Won 4 Oscars. 38 wins & 33 nominations total",
+        "rate": "91%"
     }
 }
