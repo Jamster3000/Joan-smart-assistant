@@ -1,5 +1,4 @@
 import random, webbrowser, html, requests, json, datetime
-from nltk import IncrementalBottomUpLeftCornerChartParser
 from nltk.corpus.reader import udhr
 import pandas as pd
 from youtubesearchpython import VideosSearch
@@ -734,3 +733,11 @@ class movie():
                 movie_data = data["The " + user_input]
                 awards = movie_data['awards']
                 print(f"The awards for The {user_input} is: {awards}")
+                
+def read_latest_news():
+    internet = check_internet()
+    
+    if internet == 0:
+        print(chatbot_tools.random_output('read article'))
+    else:
+        print(chatbot_tools.random_output('no internet'))

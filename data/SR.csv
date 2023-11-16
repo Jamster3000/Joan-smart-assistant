@@ -3,7 +3,12 @@ yes,positive
 okay,positive
 one more,positive
 few more,positive
+continue,positive
 okay sure,positive
+next,positive
+url,positive
+description,positive
+open url,positive
 y,positive
 n,negative
 yeah,positive
@@ -60,6 +65,12 @@ not really,negative
 not necessarily,negative
 not likely,negative
 unlikely,negative
+enough,negative
+dont show,negative
+dont show context,negative
+dont show game,negative
+not interested,negative
+enough now,negative
 impossible,negative
 not a chance,negative
 under no circumstances,negative
@@ -71,6 +82,7 @@ alas no,negative
 regretfully no,negative
 against my better judgment,negative
 I must decline,negative
+not show,negative
 forbidden it is,negative
 the fates decree otherwise,negative
 I cannot in good conscience,negative

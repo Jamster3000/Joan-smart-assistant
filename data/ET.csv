@@ -69,6 +69,11 @@ trivia time,play trivia
 round of trivia,play trivia
 want to play trivia,play trivia
 quiz,play trivia
+xkcd,xkcd
+show me funny comic,xkcd
+funny comic,xkcd
+show something funny,xkcd
+xkcd funny,xkcd
 quit,quit
 exit trivia,quit
 enough trivia,quit
@@ -111,11 +116,6 @@ impress me with fact,fact
 educate me with fact,fact
 drop fact,fact
 hit me with fact,fact
-xkcd,xkcd
-show me funny comic,xkcd
-funny comic,xkcd
-show something funny,xkcd
-xkcd funny,xkcd
 play akinator,akinator
 open akinator,akinator
 let play game akinator,akinator
@@ -282,3 +282,8 @@ actor for ,movie actor
 what is the plot of ,movie plot
 what languages are ,movie language
 what awards did win,movie award
+late news,latest news
+tell late news,latest news
+what go late news,latest news
+what go world,latest news
+what go world,latest news

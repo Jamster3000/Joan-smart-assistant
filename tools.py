@@ -31,6 +31,14 @@ class process_text_tools():
         return None
 
 class chatbot_tools():
+    def extract_website_name(url):
+        pattern = re.compile(r'https?://([^/]+)')
+        match = pattern.match(url)
+        if match:
+            return match.group(1)
+        else:
+            return None
+    
     def big_guns(user_input):
         user_data = chatbot_tools.get_user_data()
         response = requests.get(f'https://api.wolframalpha.com/v2/query?input={user_input.replace(" ", "+")}&format=plaintext&output=JSON&appid=E96E34-TYEKWH2QKL')
@@ -107,7 +115,7 @@ class chatbot_tools():
             return 'unknown'
         
     def write_user_data(first_name="",middle_name="",surname="",dob="",nickname="",age="",gender="",interests="",fix_boredom="",f_song="",f_music_genre="",f_film="",f_book="",f_food="",dislike_food="",disability="",
-                        pet_amount="",type_pet="",name_pet="",education="",work="",visited_places="",living_place='',news_interest="",news_hate="",city='',country='', location_key=''):
+                        pet_amount="",type_pet="",name_pet="",education="",work="",visited_places="",living_place='',news_interest="",news_hate="",city='',country='', location_key='', band_news_site=''):
 
         file_path = 'data/user data.csv'
         data = []
@@ -165,13 +173,15 @@ class chatbot_tools():
         if news_interest != '':
             data[0]['news interest'] = news_interest
         if news_hate != '':
-            data[0]['news hate'] = news_hate
+            data[0]['news hate'] += ', ' + news_hate
         if city != '':
             data[0]['city'] = city
         if country != '':
             data[0]['country'] = country
         if location_key != '':
             data[0]['location key'] = location_key
+        if band_news_site != '':
+            data[0]['band news site'] += ', ' + band_news_site
 
         with open(file_path, mode='w', newline='') as file:
             fieldnames = data[0].keys()
@@ -182,6 +192,7 @@ class chatbot_tools():
 
             
     def get_user_data():      
+        pd.set_option('display.max_colwidth', None)
         user_data = pd.read_csv('data/user data.csv', )
 
         #user info from csv file
@@ -214,6 +225,7 @@ class chatbot_tools():
         city = user_data['city'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '').replace('0', '')
         country = user_data['country'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
         location_key = user_data['location key'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
+        band_news_site = user_data['band news site'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
 
         memory_data = {'index': index,'first name': first_name,'middle name': middle_name,'surename': surename,
                        'dob': dob,'nickname': nickname,'age': age,'gender': gender,
@@ -223,7 +235,7 @@ class chatbot_tools():
                        'number of pets': amount_of_pets,'name of pets': name_of_pets,'type of pets': type_of_pets,
                        'education': education,'work': work,'places visited': visited_places,'living location': living_location,
                        'news interest': news_interest,'news hate': news_hate,'city':city, 'country':country,
-                       'location key':location_key}
+                       'location key':location_key, 'band news site': band_news_site}
         
         return memory_data
     

@@ -52,8 +52,7 @@ class how_are_you_response():
                 print(chatbot_tools.random_output('play akinator suggestion'))
         else:
             print(chatbot_tools.get_user_data()['fix bordem'])
-        return None
-            
+        return None 
         
     def suggest_food():
         user_data = chatbot_tools.get_user_data()

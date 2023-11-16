@@ -2,7 +2,7 @@ import time, datetime
 
 start_time = time.time()
 
-import csv, random, string
+import csv, random, string, webbrowser
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC, SVC
@@ -230,6 +230,90 @@ class models():
                     article.print(extended=True)
             else:
                 print(chatbot_tools.randomt_output('no worries general'))
+        
+        elif context == 'read article':
+            latest_news = requests.get('https://api.currentsapi.services/v1/latest-news?page_size=200&language=en&apiKey=iChF0rDovQfg2Kf787UiAGKB4QHOBLK2aSrSp6mA8PSGhzVe')
+            if latest_news.status_code == 200:
+                latest_news = latest_news.json()
+                print(chatbot_tools.random_output('newest articles'))
+                
+                '''
+                {'status': 'ok', 'news': [{'id': 'bab4686d-163f-4267-a689-80dc20f46a9f', 'title': "Backblaze starts tracking 'hot drives' as planet temp rises", 'description': 'Quarterly stats to show when units exceed manufacturer max temp', 'url': 'https://www.theregister.com/2023/11/14/backblaze_starts_tracking_temperature_drives/', 'author': 'Dan Robinson', 'image': 'https://regmedia.co.uk/2023/11/14/shutterstock_drive_flame.jpg', 'language': 'en', 'category': ['business'], 'published': '2023-11-14 14:02:10 +0000'}
+                '''
+
+                read_articals = True
+                article_iteration = 0
+                while read_articals is True:
+                    try:
+                        user_data = chatbot_tools.get_user_data()
+                        article = latest_news['news'][article_iteration]
+                        source = chatbot_tools.extract_website_name(article['url'])
+                    
+                        category_result = [t in article['category'] for t in user_data['news hate'].rstrip().lstrip().split(', ')]
+                        site_result = [t in article['url'] for t in list(filter(None, user_data['band news site'].rstrip().lstrip().split(', ')))]
+
+                        if True in category_result:#if the user doesn't want to know about news taged with specific categories
+                            article_iteration += 1
+                        else:
+                            if True in site_result and user_data['band news site'] != '':
+                                article_iteration += 1
+                            else:
+                                print(f"{article['title']} - {source} - category: {', '.join(article['category'])}")
+ 
+                                news_user_input = input('... ')
+                    
+                                #if user input is postive or negative
+                                sr_vectorizer = vectorizer.transform([news_user_input])
+                                sentiment = classifier.predict(sr_vectorizer)[0]
+
+                                if sentiment == 'positive' and 'continue' in news_user_input or 'description' in news_user_input:
+                                    #read the description of title
+                                    print(article['description'])
+                        
+                                    news_user_input = input('Let me know if you want me to open the article or continue to the next article:')
+                                    #if user input is postive or negative
+                                    sr_vectorizer = vectorizer.transform([news_user_input])
+                                    sentiment = classifier.predict(sr_vectorizer)[0]
+
+                                    if sentiment == 'positive' and 'next' in news_user_input:#moves to next article
+                                        article_iteration += 1 
+                            
+                                    elif sentiment == 'positive' and 'url' in news_user_input:#opens the url to the article to find out more
+                                         webbrowser.open(article['url'])
+                            
+                                    elif sentiment == 'negative':#stops reading or taking inout for the news
+                                        with open('data/expected context.txt', 'w') as w:
+                                            w.write('')
+                                        read_articals = False
+                            
+                                elif 'next' in news_user_input:#moves onto the next article
+                                    article_iteration += 1
+                        
+                                elif sentiment == 'negative' and "not interested" in news_user_input:#removes a specific category stopping it from suggesting news from category
+                                    categories = ["technology","lifestyle","business","general","programming","science","entertainment","world","sports","finance","academia","politics","health","opinion","food","game","fashion","academic","crap","travel","culture","economy","environment","art","music","notsure","CS","education","redundant","television","commodity","movie","entrepreneur","review","auto","energy","celebrity","medical","gadgets","design","EE","security","mobile","estate","funny"]
+                                    find_category = [i for i in categories if news_user_input == categories]
+
+                                    if find_category == []:#meaning that the category wasn't specified
+                                        chatbot_tools.write_user_data(news_hate=', '.join(article['category']))
+                                        article_iteration += 1
+                                    else:
+                                        chatbot_tools.write_user_data(news_hate=find_category)
+                                        article_iteration += 1
+                        
+                                elif sentiment == 'negative' and "don't show" in news_user_input or "dont show" in news_user_input:
+                                    chatbot_tools.write_user_data(band_news_site=article['url'])
+                                    article_iteration += 1
+                            
+                                elif sentiment == 'negative':
+                                    with open('data/expected context.txt', 'w') as w:
+                                        w.write('')
+                                    read_articles = False
+                    except IndexError:
+                        print(chatbot_tools.random_output('no more latest news'))
+                        with open('data/expected context.txt', 'w') as w:
+                            w.write('')
+                        read_articals = False
+
         elif context == 'wikihow search':
             with open('data/wiki links.txt', 'w') as f:
                 f.write(user_input)
@@ -286,6 +370,7 @@ class models():
                     f.write('')
                 print(chatbot_tools.random_output('passcode denied'))
         elif context == 'welcome user':
+            #get the user's name from their input
             user_name = chatbot_tools.get_user_name(user_input)
             user_name = user_name[0].split(' ')
             if len(user_name) > 1:
@@ -297,6 +382,15 @@ class models():
                 chatbot_tools.write_user_data(first_name=user_name[0])
             user_data = chatbot_tools.get_user_data()
             print(chatbot_tools.random_output('welcome users name').replace('<user-name>', user_data['first name']))
+            
+            #get the user's gender based on their name using an api
+            gender_call = requests.get(f"https://api.genderize.io?name={user_data['first name']}")
+            
+            if gender_call.status_code == 200:
+                gender_call = gender_call.json()
+                gender = gender_call['gender']
+                chatbot_tools.write_user_data(gender=gender)
+
         elif context == 'change passcode':
             sr_vectorizer = vectorizer.transform([user_input])
             sentiment = classifier.predict(sr_vectorizer)[0]
@@ -628,6 +722,8 @@ class models():
                 elif entity == 'specific weather location':
                     user_input = user_input.split('for ')
                     weather_for_area(user_input[1])
+                elif entity == 'latest news':
+                    read_latest_news()
                 else:
                     chatbot_tools.big_guns(user_input)
   
@@ -724,8 +820,8 @@ while run_loop is True:
     models.process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier)
 
 ###for any code that is temp search for ***
-#TODO: Need to add bot birthday output once completed, including it's age
+#TODO: Need to add bot birthday output once completed version, including it's age
 #TODO: Need to be able to ask the user questions about themselves
 #TODO: Work on the list of all the other apis in the other downloaded file
-#TODO: Ask it what the weather is like for X place 
 #TODO: Get it to cache the wolfram alpha outputs meaning that this bot can learn new inputs/outputs without the need to call on wolfram alpha, do not cache math questions
+#iChF0rDovQfg2Kf787UiAGKB4QHOBLK2aSrSp6mA8PSGhzVe
