@@ -24,15 +24,18 @@ correct-answer - The correct answer to a trivia question
 
 list-games - a list of games that can be played with Joan
 
+unsafe-scans - the amount of scans that returned as a dangerous website
+
+food - food
 ______________________________________________________________________________________________________________
 
 ###data files###
 
 The csv data files are named based on their letters
 
-ET.csv - Entity tag
+datasets/ET.csv - Entity tag
 
-ER.csv - Emotion recognition
+datasets/ER.csv - Emotion recognition
 
 conversations.csv - For remembing past conversations
 

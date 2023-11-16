@@ -6,6 +6,7 @@ few more,positive
 continue,positive
 okay sure,positive
 next,positive
+sure why not,positive
 url,positive
 description,positive
 open url,positive
@@ -85,6 +86,7 @@ I must decline,negative
 not show,negative
 forbidden it is,negative
 the fates decree otherwise,negative
+alright that enough,negative
 I cannot in good conscience,negative
 pass,negative
 dont know,negative

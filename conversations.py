@@ -17,7 +17,7 @@ class how_are_you_response():
     def bordem_fix():
         internet = check_internet()
 
-        random_number = random.randint(1, 14)
+        random_number = 14# random.randint(1, 15)
 
         user_data = chatbot_tools.get_user_data()
         if user_data['fix bordem'] == '':
@@ -50,19 +50,29 @@ class how_are_you_response():
                 print(chatbot_tools.random_output('read wikipedia suggestion'))
             elif random_number == 13:
                 print(chatbot_tools.random_output('play akinator suggestion'))
+            elif random_number == 14:
+                result = requests.get('https://www.boredapi.com/api/activity/')
+                if result.status_code == 200:
+                    result = result.json()
+                    
+                    print(f"How about you try to {result['activity']}")
+                    
+                    with open('data/expected context.txt', 'w') as w:
+                        w.write('random activity')
         else:
             print(chatbot_tools.get_user_data()['fix bordem'])
         return None 
         
     def suggest_food():
-        user_data = chatbot_tools.get_user_data()
+        suggest_meal()
+        '''user_data = chatbot_tools.get_user_data()
 
         if user_data['favourite food'] == '':
             print(chatbot_tools.random_output('unknown fix hunger').replace('<user-name>', user_data['first name']))
         else:
             print(chatbot_tools.random_output('fix hunger').replace('<F-food>', user_data['favourite food']).replace('<user-name>', user_data['first name']))
         
-        return None
+        return None'''
 
 def greeting_response(user_input):
     current_hour = datetime.datetime.now().hour

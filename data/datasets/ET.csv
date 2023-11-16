@@ -1,5 +1,4 @@
 name,ET
-how to ,how to
 hello,greeting
 hi,greeting
 hi there,greeting
@@ -9,6 +8,7 @@ yo,greeting
 howdy,greeting
 morning,greeting
 afternoon,greeting
+good afternoon,greeting
 evening,greeting
 night,greeting
 bye,bye
@@ -48,6 +48,8 @@ random one,random wikihow article
 search wikihow article,search wikihow
 rps,play rps
 tell me joke,tell joke
+how to cook ,search
+how to bake ,search
 how about a joke,tell joke
 something funny,tell joke
 make me laugh,tell joke
@@ -56,6 +58,7 @@ shoot with joke,tell joke
 tell me a joke,tell joke
 tell me riddle,tell riddle
 how about a riddle,tell riddle
+how to ,how to
 shoot with riddle,tell riddle
 tell me a riddle,tell riddle
 give me brain teaser,tell riddle
@@ -164,7 +167,7 @@ what weather like,current weather
 weather now,current weather
 current weather,current weather
 weather tomorrow,weather tomorrow
-what weather like tomorrow
+what weather like tomorrow,
 what weather tomorow,weather tomorrow
 tomorrow weather,weather tomorrow
 weather on ,weather day
@@ -203,7 +206,7 @@ why give name,why named
 why Joan,why named
 love me,love user
 are robot,robot
-are humna,human
+are human,human
 change your name,change bot name
 are you real,real or not
 where are you,where
@@ -258,6 +261,9 @@ what month,month
 what year,year
 tell me year,year
 current year,year
+space new,space news
+latest space new,space news
+show space new,space news
 weather monday,weather monday
 weather tuesday,weather tuesday
 weather wednesday,weather wednesday
@@ -287,3 +293,14 @@ tell late news,latest news
 what go late news,latest news
 what go world,latest news
 what go world,latest news
+scan current website,scan open website
+scan open website,scan open website
+scan copy website,scan copied website
+search for ,search
+show recipies for ,search
+ingredients for ,ingredients
+suggest meal,meal suggestion
+what does it mean,"pronoun | third-person singular personal pronoun, refers to one inanimate object or to one person or animal with no gender or unknown gender"
+thanls,You're welcome!
+amazing,"1 | adjective | surprising greatly
+2 | adjective | inspiring awe or admiration or wonder"

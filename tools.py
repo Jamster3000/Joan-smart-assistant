@@ -1,9 +1,7 @@
-import re, csv, random, re, requests, sys, subprocess, json, datetime
+import csv, random, json, datetime
 import pandas as pd
-from word2number import w2n
 import nltk
 from nltk import RegexpParser, sent_tokenize, word_tokenize, pos_tag, Tree, ne_chunk
-from inflect import engine
 
 #finding food in text
 patterns="""
@@ -16,22 +14,16 @@ NPChunker = RegexpParser(patterns)
     
 class process_text_tools():
     def preprocess_text(text):
+        import re
+        
         text = text.lower()
         text = re.sub(r'[^\w\s]', '', text)
         return text
-    
-    def conversation_memory(user_input):
-        with open('data/conversation.csv', 'r', newline='', encoding='utf8') as file:
-            reader = csv.reader(file)
-            next(reader)
-            
-            for row in reader:
-                if row[0] == user_input:
-                    return row[1]
-        return None
 
 class chatbot_tools():
     def extract_website_name(url):
+        import re
+        
         pattern = re.compile(r'https?://([^/]+)')
         match = pattern.match(url)
         if match:
@@ -40,6 +32,9 @@ class chatbot_tools():
             return None
     
     def big_guns(user_input):
+        import requests
+        
+        print('Big guns running')
         user_data = chatbot_tools.get_user_data()
         response = requests.get(f'https://api.wolframalpha.com/v2/query?input={user_input.replace(" ", "+")}&format=plaintext&output=JSON&appid=E96E34-TYEKWH2QKL')
         if response.status_code == 200:
@@ -47,10 +42,18 @@ class chatbot_tools():
             data_type = data['queryresult']['datatypes']
 
             try:
-                if data_type == 'Math':
+                if data_type == 'Math':#if it's a maths question format the output
                     print("The answer to your math question is: " + str(data['queryresult']['pods'][1]['subpods'][0]['plaintext']))
-                else:
-                    print(data['queryresult']['pods'][1]['subpods'][0]['plaintext'])
+                else: #if not maths question just output result
+                    answer = (data['queryresult']['pods'][1]['subpods'][0]['plaintext'])
+                    print(answer)
+
+                    ET_pd = pd.read_csv('data/datasets/ET.csv')#load csv file
+                    
+                    new_data = {'name': user_input.lower().lstrip().rstrip(), 'ET': answer}
+                    
+                    ET_pd.loc[len(ET_pd)] = new_data
+                    ET_pd.to_csv('data/datasets/ET.csv', index=False)
             except KeyError:
                 print(chatbot_tools.random_output('Unable to respond').replace('<user-name>', user_data['first name']))
 
@@ -102,6 +105,8 @@ class chatbot_tools():
         return names
     
     def restart_program():
+        import sys, subprocess
+        
         python = sys.executable
         script = sys.argv[0]
         subprocess.Popen([python, script])
@@ -109,6 +114,7 @@ class chatbot_tools():
         
     def process_input_to_numbers(text):
         try:
+            from word2number import w2n
             get_number = w2n.word_to_num(text)
             return get_number
         except ValueError:
@@ -252,7 +258,7 @@ class chatbot_tools():
             raise FileNotFoundError
         
     def random_output(tag):
-        with open('data/responses.csv', 'r', encoding='utf8') as f:
+        with open('data/datasets/responses.csv', 'r', encoding='utf8') as f:
             reader = csv.reader(f)
 
             matching_rows = [row[1:] for row in reader if row[0] == tag]
@@ -295,6 +301,7 @@ class text_tools():
         return '-'.join(nps).replace('favourite food', '').replace(text, '')
     
     def find_food(text):
+        from inflect import engine
         text = "favourite food is " + text
         p = engine()#inflect
         
@@ -307,6 +314,7 @@ class text_tools():
         
 def check_internet():
     try:
+        import requests
         response = requests.get("http://www.google.com", timeout=5)
         response.raise_for_status()
         return 0
@@ -317,6 +325,7 @@ def get_ip_address():
     '''
     Gets the user's device IP address
     '''
+    import requests
     response = requests.get('https://api64.ipify.org?format=json').json()
     return response['ip']
 
@@ -324,6 +333,8 @@ def get_location_key():
     '''
     Gets the location key from accuweather api which uses the user's IP address
     '''
+    import requests
+    
     weather_api_key = 'F7DxhfQx1EoPuopgN59Tq0OkGRJwVkWQ'
     user_data = chatbot_tools.get_user_data()
     city = user_data['city']
@@ -358,6 +369,7 @@ def get_ip_data():
     '''
     Gets data from the IP address including city and country the user's device is in
     '''
+    import requests
     internet = check_internet()
     if internet == 0:
         ip_address = get_ip_address()#get the device ip address
@@ -378,3 +390,35 @@ def get_ip_data():
             pass
     else:
         pass
+    
+def copy_website_url():
+    from pyperclip import paste
+    from pyautogui import hotkey, press
+    
+    hotkey('alt', 'tab')
+    hotkey('ctrl', 'l')
+    hotkey('ctrl', 'c')
+    press('esc')
+    hotkey('alt', 'tab')
+
+    return paste()
+
+def get_copied_text():
+    from pyperclip import paste
+    
+    return paste()
+
+def recipe_by_title(title):
+    title = title.lower().rstrip().lstrip().replace('&', 'and')
+    with open('data/datasets/recipies/json', 'r') as json_file:
+        data_list = json.load(json_file)
+        
+        for data_dict in data_list:
+            meals = data_dict.get('meals', [])
+            try:
+                meal = [m for m in meals if title in m.get('strMeal').lower().replace('&', 'and')]
+                if meal != []:
+                    return meal
+            except TypeError:
+                pass
+    return None

@@ -1,8 +1,10 @@
-import time, datetime
+import time, datetime, warnings
+
+warnings.filterwarnings("ignore")
 
 start_time = time.time()
 
-import csv, random, string, webbrowser
+import csv, random, threading
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC, SVC
@@ -10,7 +12,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.linear_model import LogisticRegression
 from fuzzywuzzy import process
-from pywikihow import RandomHowTo, HowTo, search_wikihow
 from tools import *
 from conversations import *
 from interactions import *
@@ -33,8 +34,13 @@ write_to_log('All libraries imported. Time taken... ' + str(end_time-start_time)
 
 get_ip_data()
 
-class models():
-    def process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifie):
+class models():       
+    def process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier):
+        #imports
+        import string
+        import webbrowser
+        from pywikihow import RandomHowTo, HowTo, search_wikihow
+        
         with open('data/expected context.txt', 'r') as f:
             context = f.read()
         
@@ -231,15 +237,71 @@ class models():
             else:
                 print(chatbot_tools.randomt_output('no worries general'))
         
+        elif context == 'read space article':
+            latest_news = requests.get('https://api.spaceflightnewsapi.net/v4/articles/?format=json')
+            if latest_news.status_code == 200:
+                latest_news = latest_news.json()
+                print(chatbot_tools.random_output('newest space articles'))
+
+                read_articals = True
+                article_iteration = 0
+                while read_articals is True:
+                    try:
+                        user_data = chatbot_tools.get_user_data()
+                        article = latest_news['results'][article_iteration]
+                        source = article["news_site"]
+                   
+                        print(f"{article['title']} - {source}")
+ 
+                        news_user_input = input('... ')
+                    
+                        #if user input is postive or negative
+                        sr_vectorizer = vectorizer.transform([news_user_input])
+                        sentiment = classifier.predict(sr_vectorizer)[0]
+                        print(sentiment)
+
+                        if sentiment == 'positive' and 'continue' in news_user_input or 'description' in news_user_input:
+                            #read the summary of title
+                            print(article['summary'])
+                        
+                            news_user_input = input('Let me know if you want me to open the article or continue to the next article:')
+                            #if user input is postive or negative
+                            sr_vectorizer = vectorizer.transform([news_user_input])
+                            sentiment = classifier.predict(sr_vectorizer)[0]
+
+                            if sentiment == 'positive' and 'next' in news_user_input:#moves to next article
+                                article_iteration += 1 
+                            
+                            elif sentiment == 'positive' and 'url' in news_user_input or 'open' in news_user_input:#opens the url to the article to find out more
+                                 webbrowser.open(article['url'])
+                                 article_iteration += 1
+                            
+                            elif sentiment == 'negative':#stops reading or taking inout for the news
+                                with open('data/expected context.txt', 'w') as w:
+                                    w.write('')
+                                read_articals = False
+                                break
+                            
+                        elif 'next' in news_user_input:#moves onto the next article
+                            article_iteration += 1
+                            
+                        elif sentiment == 'negative':
+                            print('test')
+                            with open('data/expected context.txt', 'w') as w:
+                                w.write('')
+                            read_articles = False
+                            break
+                    except IndexError:
+                        print(chatbot_tools.random_output('no more latest news'))
+                        with open('data/expected context.txt', 'w') as w:
+                            w.write('')
+                        read_articals = False
+
         elif context == 'read article':
             latest_news = requests.get('https://api.currentsapi.services/v1/latest-news?page_size=200&language=en&apiKey=iChF0rDovQfg2Kf787UiAGKB4QHOBLK2aSrSp6mA8PSGhzVe')
             if latest_news.status_code == 200:
                 latest_news = latest_news.json()
                 print(chatbot_tools.random_output('newest articles'))
-                
-                '''
-                {'status': 'ok', 'news': [{'id': 'bab4686d-163f-4267-a689-80dc20f46a9f', 'title': "Backblaze starts tracking 'hot drives' as planet temp rises", 'description': 'Quarterly stats to show when units exceed manufacturer max temp', 'url': 'https://www.theregister.com/2023/11/14/backblaze_starts_tracking_temperature_drives/', 'author': 'Dan Robinson', 'image': 'https://regmedia.co.uk/2023/11/14/shutterstock_drive_flame.jpg', 'language': 'en', 'category': ['business'], 'published': '2023-11-14 14:02:10 +0000'}
-                '''
 
                 read_articals = True
                 article_iteration = 0
@@ -285,6 +347,7 @@ class models():
                                         with open('data/expected context.txt', 'w') as w:
                                             w.write('')
                                         read_articals = False
+                                        break
                             
                                 elif 'next' in news_user_input:#moves onto the next article
                                     article_iteration += 1
@@ -308,6 +371,7 @@ class models():
                                     with open('data/expected context.txt', 'w') as w:
                                         w.write('')
                                     read_articles = False
+                                    break
                     except IndexError:
                         print(chatbot_tools.random_output('no more latest news'))
                         with open('data/expected context.txt', 'w') as w:
@@ -398,6 +462,24 @@ class models():
                 print(chatbot_tools.random_output('passcode before change'))
             else:
                 print(chatbot_tools.random_output('no worries general'))
+                
+        elif context == 'random activity':
+            sr_vectorizer = vectorizer.transform([user_input])
+            sentiment = classifier.predict(sr_vectorizer)[0]
+
+            if sentiment == 'positive':
+                print(chatbot_tools.random_output('bored activity attempt'))
+            else:
+                print(chatbot_tools.random_output('no worries general'))
+        elif context == 'info food':
+            sr_vectorizer = vectorizer.transform([user_input])
+            sentiment = classifier.predict(sr_vectorizer)[0]
+            
+            if sentiment == 'positive':
+                with open('data/tempFile.txt', 'r') as f:
+                    read = f.read()
+                    
+                search_food_ingriedents(read)
         elif context == 'passcode before change':
             with open('data/user passcode.txt', 'r') as f:
                 passcode = f.read()
@@ -410,322 +492,337 @@ class models():
             else:
                 print(chatbot_tools.random_output('blank passcode denied'))
         elif context == 'choose video':
+            from youtubesearchpython import VideosSearch
             videoResults = VideosSearch(user_input, limit=1)
             webbrowser.open(videoResults.result()['result'][0]['link'])
             chatbot_tools.open_file('data/expected context.txt', file='w', text='')
         else:
             matched_keywords = models.find_matched_keywords(user_input, vectorizer, threshold=0.6)
         
-            #memory
-            memory = process_text_tools.conversation_memory(user_input)
-            if memory:
-                print(memory.replace(r'\n', '\n'))
-            else:
-                text = process_text_tools.preprocess_text(user_input)
-                text_vectorized = vectorizer.transform([text])
-                entity = classifier.predict(text_vectorized)[0]
+            text = process_text_tools.preprocess_text(user_input)
+            text_vectorized = vectorizer.transform([text])
+            entity = classifier.predict(text_vectorized)[0]
                 
-                intent = models.find_intent(user_input, ET_data)
+            intent = models.find_intent(user_input, ET_data)
                 
-                conversation_data[0][0] = user_input
-                conversation_data[0][2] = entity
+            conversation_data[0][0] = user_input
+            conversation_data[0][2] = entity
                 
-                try:
-                    ET_data.set_index('name', inplace=True)
-                except KeyError:
-                    pass
-                print(entity)#***
-                if entity == 'greeting':
-                    greeting_response(user_input)
-                elif entity == 'been while':
-                    been_while()
-                elif entity == 'how are you':
-                    how_are_you()
-                elif entity == 'play blackjack':
-                    games.blackjack(user_input)
-                elif entity == 'play guessing game':
-                    games.numberGuess()
-                elif entity == 'play rps':
-                    games.rps()
-                elif entity == 'tell joke':
-                    tell_joke()
-                elif entity == 'tell riddle':
-                    tell_riddle()
-                elif entity == 'fact':
-                    facts()
-                elif entity == 'wiki game':
-                    games.open_wiki_game()
-                elif entity == 'xkcd':
-                    games.xkcd()
-                elif entity == 'random wikihow article':
-                    wikihow()
-                elif entity == 'factory reset':
-                    with open('data/user passcode.txt', 'r') as f:
-                        passcode = f.read()
+            try:
+                ET_data.set_index('name', inplace=True)
+            except KeyError:
+                pass
+            
+            print(entity)#***
+            if entity == 'greeting':
+                greeting_response(user_input)
+            elif entity == 'been while':
+                been_while()
+            elif entity == 'how are you':
+                how_are_you()
+            elif entity == 'play blackjack':
+                games.blackjack(user_input)
+            elif entity == 'play guessing game':
+                games.numberGuess()
+            elif entity == 'play rps':
+                games.rps()
+            elif entity == 'tell joke':
+                tell_joke()
+            elif entity == 'tell riddle':
+                tell_riddle()
+            elif entity == 'fact':
+                facts()
+            elif entity == 'wiki game':
+                games.open_wiki_game()
+            elif entity == 'xkcd':
+                games.xkcd()
+            elif entity == 'random wikihow article':
+                wikihow()
+            elif entity == 'factory reset':
+                with open('data/user passcode.txt', 'r') as f:
+                    passcode = f.read()
                     
-                    if passcode == '' or passcode not in user_input:
-                        print(chatbot_tools.random_output('factory reset unrecognized passcode'))
-                    else:
-                        print(chatbot_tools.random_output('factory reset passcode accecpted'))
-                        factory_reset()
-                elif entity == 'how to':
-                    with open('data/wiki links.txt', 'w') as f:
-                        f.write(user_input)
-                    print(chatbot_tools.random_output('wikihow search read or open'))
-                elif entity == 'search wikihow':
-                    print(chatbot_tools.random_output('wikihow search'))
-                elif entity == 'akinator':
-                    games.akinator()
-                elif entity == 'list games':
-                    games.game_list()
-                elif entity == 'describe akinator':
-                    print(chatbot_tools.random_output('explain akinator'))
-                elif entity == 'descrive wiki game':
-                    print(chatbot_tools.random_output('explain wiki game'))
-                elif entity == 'bye':
-                    print(chatbot_tools.random_output('bye').replace('<user-name>', user_data['first name']))
-                elif entity == 'thank':
-                    print(chatbot_tools.random_output('thank').replace('<user_name>', user_data['first name']))
-                elif entity == 'set passcode':
-                    with open('data/user passcode.txt', 'r') as f:
-                        passcode = f.read()
-                    
-                    if passcode == '':
-                        print(chatbot_tools.random_output('speak passcode'))
-                    else:
-                        print(chatbot_tools.random_output('current passcode'))
-                elif entity == 'play trivia':
-                    print(chatbot_tools.random_output('accepct trivia request'))
-                    with open('data/amountOfQuestions.txt', 'r+') as f:
-                        read = f.read()
-                        if read == '':
-                            user_difficulty = input("What difficulty would you like the questions. Your choices are either easy, medium, hard, or you can just have any questions.")
-                            if 'easy' in user_difficulty.lower():
-                                difficulty = 'easy'
-                            elif 'medium' in user_difficulty.lower():
-                                difficulty = 'medium'
-                            elif 'hard' in user_difficulty.lower():
-                                difficulty = 'hard'
-                            else:
-                                difficulty = 'none'
-                                
-                            with open('data/quiz difficulty.txt', 'w') as f:
-                                f.write(difficulty)
-                            #ask user how many questions they would like
-                            user_question_amount = chatbot_tools.process_input_to_numbers(input(chatbot_tools.random_output('amount of questions') + '\n'))
-                            if user_question_amount == 'unknown':
-                                trivia_quiz('100000000')
-                            else:
-                                trivia_quiz(user_question_amount)
-                        elif int(read) == 0:
-                            print(chatbot_tools.random_output('no more questions').replace('<user-name>', user_data['first name']))
-                        else:
-                            num = int(read) - 1 
-                            f.write(str(num))
-                            trivia_quiz(read)
-                elif entity == 'play game':
-                    print(chatbot_tools.random_output('suggest play game'))
-                elif entity == 'what is passcode':
-                    print(chatbot_tools.random_output('explain passcode'))
-                elif entity == 'current weather':
-                    current_weather()
-                elif entity == 'weather tomorrow':
-                    weather_tomorrow()
-                elif entity == 'weather day':
-                    weather_day()
-                elif entity == 'choose youtube video':
-                    internet = check_internet()
-                    if internet == 0:
-                        print(chatbot_tools.random_output('choose video'))
-                    else:
-                        print(chatbot_tools.random_output('no internet'))
-                elif entity == 'users name':
-                    user_data = chatbot_tools.get_user_data()
-                    print(chatbot_tools.random_output('tell user name').replace('<user-name>',user_data['first name']))
-                elif entity == 'advice':
-                    with open('data/advice.txt', 'r') as f:
-                        advice = f.readlines()
-                    
-                    print(random.choice(advice))
-                elif entity == 'question amount':
-                    print(chatbot_tools.random_output('amount of questions data'))
-                elif entity == 'chewie':
-                    print(chatbot_tools.random_output('chewie'))
-                elif entity == 'wax on':
-                    print(chatbot_tools.random_output('wax of'))
-                elif entity == 'wizard of oz':
-                    print(chatbot_tools.random_output('dog too'))
-                elif entity == 'mama says':
-                    print(chatbot_tools.random_output('stupid'))
-                elif entity == 'roads':
-                    print(chatbot_tools.random_output('roads'))
-                elif entity == 'father':
-                    print(chatbot_tools.random_output('father'))
-                elif entity == 'rd1':
-                    print(chatbot_tools.random_output('red dwarf one').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd2':
-                    print(chatbot_tools.random_output('red dwarf two').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd3':
-                    print(chatbot_tools.random_output('red dwarf three').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd4':
-                    print(chatbot_tools.random_output('red dwarf four').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd5':
-                    print(chatbot_tools.random_output('red dwarf five').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd6':
-                    print(chatbot_tools.random_output('red dwarf six').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd7':
-                    print(chatbot_tools.random_output('red dwarf seven').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd8':
-                    print(chatbot_tools.random_output('red dwarf eight').replace('<user-name>', user_data['first name']))
-                elif entity == 'rd9':
-                    print(chatbot_tools.random_output('red dwarf nine').replace('<user-name>', user_data['first name']))
-                elif entity == 'who are you':
-                    print(chatbot_tools.random_output('who are you'))
-                elif entity == 'call bot':
-                    print(chatbot_tools.random_output('call bot'))
-                elif entity == 'why named':
-                    print(chatbot_tools.random_output('why named'))
-                elif entity == 'love user':
-                    print(chatbot_tools.random_output('love user').replace('<user-name>', user_data['first name']))
-                elif entity == 'robot':
-                    print(chatbot_tools.random_output('not robot'))
-                elif entity == 'human':
-                    print(chatbot_tools.random_output('not human'))
-                elif entity == 'change bot name':
-                    print(chatbot_tools.random_output('change bot name'))
-                elif entity == 'real or not':
-                    print(chatbot_tools.random_output('real or not'))
-                elif entity == 'where':
-                    print(chatbot_tools.random_output('where').replace('<user-name>', user_data['first name']))
-                elif entity == 'last night':
-                    print(chatbot_tools.random_output('last night'))
-                elif entity == 'what doing':
-                    print(chatbot_tools.random_output('what doing'))
-                elif entity == 'what next':
-                    print(chatbot_tools.random_output('what next').replace('<user-name>', user_data['first name']))
-                elif entity == 'collection':
-                    print(chatbot_tools.random_output('bot collection'))
-                elif entity == 'bot hobby':
-                    print(chatbot_tools.random_output('bot hobby'))
-                elif entity == 'talk request':
-                    print(chatbot_tools.random_output('talk request').replace('<user-name>', user_data['first name']))
-                elif entity == 'question bot':
-                    print(chatbot_tools.random_output('question').replace('<user-name>', user_data['first name']))
-                elif entity == 'something':
-                    print(chatbot_tools.random_output('something'))
-                elif entity == 'not talking bot':
-                    print(chatbot_tools.random_output('not talking bot').replace('<user-name>', user_data['first name']))
-                elif entity == 'bot live forever':
-                    print(chatbot_tools.random_output('bot live forever'))
-                elif entity == 'bot favourite':
-                    print(chatbot_tools.random_output('bot favourite'))
-                elif entity == 'created':
-                    print(chatbot_tools.random_output('created'))
-                elif entity == 'gender':
-                    print(chatbot_tools.random_output('gender'))
-                elif entity == 'bot version':
-                    with open('data/version.txt', 'r') as f:
-                        version = f.read()
-                    print(chatbot_tools.random_output('version'))
-                elif entity == 'user thinking':
-                    print(chatbot_tools.random_output('user thinking'))
-                elif entity == 'knowledge about user':
-                    print('Here are the things that I know about you')
-                    if user_data['first name'] != '':
-                        print(f"Your first name is {user_data['first name']}")
-                    if user_data['middle name'] != '':
-                        print(f"Your middle name is {user_data['middle name']}")
-                    if user_data['surename'] != '':
-                        print(f"Your surname is {user_data['surename']}")
-                    if user_data['dob'] != '':
-                        print(f"Your date of birth is {user_data['dob']}")
-                    if user_data['nickname'] != '':
-                        print(f"Your nickname is {user_data['nickname']}")
-                    if user_data['hobbies/interest'] != '':
-                        print(f"These are your hobbies and interests {user_data['hobbies/interests']}")
-                    if user_data['favourite song'] != '':
-                        print(f"Your favourite song is {user_data['favourite song']}")
-                    if user_data['favourite music genre'] != '':
-                        print(f"Your favourite music genre is {user_data['favourite music genre']}")
-                    if user_data['favourite film'] != '':
-                        print(f"Your favourite film is {user_data['favourite film']}")
-                    if user_data['favourite food'] != '':
-                        print(f"Your favourite food is {user_data['favourite food']}")
-                    if user_data['favourite book'] != '':
-                        print(f"Your favourite book is {user_data['favourite book']}")
-                    if user_data['disliked food'] != '':
-                        print(f"You dislike {user_data['disliked food']}")
-                    if user_data['disabilities'] != '':
-                        print(f"You have {user_data['disability']}")
-                    if user_data['number of pets'] != '':
-                        print(f"You have {user_data}")
-                    if user_data['name of pets'] != '':
-                        print(f"The name of your pets are {user_data['name of pets']}")
-                    if user_data['places visited'] != '':
-                        print(f"The places you have visited are {user_data['places visited']}")
-                elif entity == 'time':
-                    tell_time()
-                elif entity == 'date':
-                    tell_date()
-                elif entity == 'day':
-                    tell_day()
-                elif entity == 'month':
-                    tell_month()
-                elif entity == 'year':
-                    tell_year()
-                elif entity == 'movie release':
-                    user_input = user_input.lower().lstrip().replace('when', '').replace('did', '').replace('release', '').replace('released', '').replace('was', '')
-                    movie.collect_data(user_input, movie.release)
-                elif entity == 'weather monday':
-                    weather_day('monday')
-                elif entity == 'weather tuesday':
-                    weather_day('tuesday')
-                elif entity == 'weather wednesday':
-                    weather_day('wednesday')
-                elif entity == 'weather thrusday':
-                    weather_day('thrusday')
-                elif entity == 'weather friday':
-                    weather_day('friday')
-                elif entity == 'weather saturday':
-                    weather_day('saturday')
-                elif entity == 'weather sunday':
-                    weather_day('sunday')      
-                elif entity == 'weather hour':
-                    weather_hour_advanced()
-                elif entity == 'movie rate':
-                    user_input = user_input.replace('what', '').replace('is', '').replace('rating' , '').replace('of', '').replace('for', '').replace('the', '').lstrip().rstrip().title()
-                    movie.collect_data("The " + user_input, movie.rate)
-                elif entity == 'movie runtime':
-                    user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('run', '').replace('time', '').replace('of', '').replace('for', '').lstrip().strip().title()
-                    movie.collect_data("The " + user_input, movie.runtime)
-                elif entity == 'movie genre':
-                    user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('genre', '').replace('of', '').lstrip().rstrip().title()
-                    movie.collect_data("The " + user_input, movie.genre)
-                elif entity == 'movie director':
-                    user_input = user_input.replace('who', '').replace('is', '').replace('director', '').replace('directed', '').replace('for', '').replace('of', '').replace('was', '').lstrip().rstrip().title()
-                    movie.collect_data(user_input, movie.director)
-                elif entity == 'movie writer':
-                    user_input = user_input.replace('who', '').replace('wrote', '').replace('is', '').replace('writer', '').replace('for', '')
-                    movie.collect_data(user_input, movie.writer)
-                elif entity == 'movie actor':
-                    user_input = user_input.replace('actors', '').replace('acted', '').replace('for', '').replace('who', '').replace('in', '').replace('actor', '').replace('is', '').replace('the', '')
-                    movie.collect_data(user_input, movie.actor)
-                elif entity == 'movie plot':
-                    user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('plot', '').replace('of', '').rstrip().lstrip().title()
-                    movie.collect_data(user_input, movie.plot)
-                elif entity == 'languages':
-                    user_input = user_input.replace('what', '').replace('languages', '').replace('language', '').replace('in', '').repalce('are', '').rstrip().lstrip().title()
-                    movie.collect_data(user_input, movie.languages)
-                elif entity == 'awards':
-                    user_input = user_input.replace('what', '').replace('award', '').replace('awards', '').replace('did', '').replace('win', '').rstrip().lstrip().title()
-                    movie.collect_data(user_input, movie.awards)
-                elif entity == 'specific weather location':
-                    user_input = user_input.split('for ')
-                    weather_for_area(user_input[1])
-                elif entity == 'latest news':
-                    read_latest_news()
+                if passcode == '' or passcode not in user_input:
+                    print(chatbot_tools.random_output('factory reset unrecognized passcode'))
                 else:
+                    print(chatbot_tools.random_output('factory reset passcode accecpted'))
+                    factory_reset()
+            elif entity == 'how to':
+                with open('data/wiki links.txt', 'w') as f:
+                    f.write(user_input)
+                print(chatbot_tools.random_output('wikihow search read or open'))
+            elif entity == 'search wikihow':
+                print(chatbot_tools.random_output('wikihow search'))
+            elif entity == 'akinator':
+                games.akinator()
+            elif entity == 'list games':
+                games.game_list()
+            elif entity == 'describe akinator':
+                print(chatbot_tools.random_output('explain akinator'))
+            elif entity == 'descrive wiki game':
+                print(chatbot_tools.random_output('explain wiki game'))
+            elif entity == 'bye':
+                print(chatbot_tools.random_output('bye').replace('<user-name>', user_data['first name']))
+            elif entity == 'thank':
+                print(chatbot_tools.random_output('thank').replace('<user-name>', user_data['first name']))
+            elif entity == 'set passcode':
+                with open('data/user passcode.txt', 'r') as f:
+                    passcode = f.read()
+                    
+                if passcode == '':
+                    print(chatbot_tools.random_output('speak passcode'))
+                else:
+                    print(chatbot_tools.random_output('current passcode'))
+            elif entity == 'play trivia':
+                print(chatbot_tools.random_output('accepct trivia request'))
+                with open('data/amountOfQuestions.txt', 'r+') as f:
+                    read = f.read()
+                    if read == '':
+                        user_difficulty = input("What difficulty would you like the questions. Your choices are either easy, medium, hard, or you can just have any questions.")
+                        if 'easy' in user_difficulty.lower():
+                            difficulty = 'easy'
+                        elif 'medium' in user_difficulty.lower():
+                            difficulty = 'medium'
+                        elif 'hard' in user_difficulty.lower():
+                            difficulty = 'hard'
+                        else:
+                            difficulty = 'none'
+                                
+                        with open('data/quiz difficulty.txt', 'w') as f:
+                            f.write(difficulty)
+                        #ask user how many questions they would like
+                        user_question_amount = chatbot_tools.process_input_to_numbers(input(chatbot_tools.random_output('amount of questions') + '\n'))
+                        if user_question_amount == 'unknown':
+                            trivia_quiz('100000000')
+                        else:
+                            trivia_quiz(user_question_amount)
+                    elif int(read) == 0:
+                        print(chatbot_tools.random_output('no more questions').replace('<user-name>', user_data['first name']))
+                    else:
+                        num = int(read) - 1 
+                        f.write(str(num))
+                        trivia_quiz(read)
+            elif entity == 'play game':
+                print(chatbot_tools.random_output('suggest play game'))
+            elif entity == 'what is passcode':
+                print(chatbot_tools.random_output('explain passcode'))
+            elif entity == 'current weather':
+                current_weather()
+            elif entity == 'weather tomorrow':
+                weather_tomorrow()
+            elif entity == 'weather day':
+                weather_day()
+            elif entity == 'choose youtube video':
+                internet = check_internet()
+                if internet == 0:
+                    print(chatbot_tools.random_output('choose video'))
+                else:
+                    print(chatbot_tools.random_output('no internet'))
+            elif entity == 'users name':
+                user_data = chatbot_tools.get_user_data()
+                print(chatbot_tools.random_output('tell user name').replace('<user-name>',user_data['first name']))
+            elif entity == 'advice':
+                with open('data/datasets/advice.txt', 'r') as f:
+                    advice = f.readlines()
+                    
+                print(random.choice(advice))
+            elif entity == 'question amount':
+                print(chatbot_tools.random_output('amount of questions data'))
+            elif entity == 'chewie':
+                print(chatbot_tools.random_output('chewie'))
+            elif entity == 'wax on':
+                print(chatbot_tools.random_output('wax of'))
+            elif entity == 'wizard of oz':
+                print(chatbot_tools.random_output('dog too'))
+            elif entity == 'mama says':
+                print(chatbot_tools.random_output('stupid'))
+            elif entity == 'roads':
+                print(chatbot_tools.random_output('roads'))
+            elif entity == 'father':
+                print(chatbot_tools.random_output('father'))
+            elif entity == 'rd1':
+                print(chatbot_tools.random_output('red dwarf one').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd2':
+                print(chatbot_tools.random_output('red dwarf two').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd3':
+                print(chatbot_tools.random_output('red dwarf three').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd4':
+                print(chatbot_tools.random_output('red dwarf four').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd5':
+                print(chatbot_tools.random_output('red dwarf five').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd6':
+                print(chatbot_tools.random_output('red dwarf six').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd7':
+                print(chatbot_tools.random_output('red dwarf seven').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd8':
+                print(chatbot_tools.random_output('red dwarf eight').replace('<user-name>', user_data['first name']))
+            elif entity == 'rd9':
+                print(chatbot_tools.random_output('red dwarf nine').replace('<user-name>', user_data['first name']))
+            elif entity == 'who are you':
+                print(chatbot_tools.random_output('who are you'))
+            elif entity == 'call bot':
+                print(chatbot_tools.random_output('call bot'))
+            elif entity == 'why named':
+                print(chatbot_tools.random_output('why named'))
+            elif entity == 'love user':
+                print(chatbot_tools.random_output('love user').replace('<user-name>', user_data['first name']))
+            elif entity == 'robot':
+                print(chatbot_tools.random_output('not robot'))
+            elif entity == 'human':
+                print(chatbot_tools.random_output('not human'))
+            elif entity == 'change bot name':
+                print(chatbot_tools.random_output('change bot name'))
+            elif entity == 'real or not':
+                print(chatbot_tools.random_output('real or not'))
+            elif entity == 'where':
+                print(chatbot_tools.random_output('where').replace('<user-name>', user_data['first name']))
+            elif entity == 'last night':
+                print(chatbot_tools.random_output('last night'))
+            elif entity == 'what doing':
+                print(chatbot_tools.random_output('what doing'))
+            elif entity == 'what next':
+                print(chatbot_tools.random_output('what next').replace('<user-name>', user_data['first name']))
+            elif entity == 'collection':
+                print(chatbot_tools.random_output('bot collection'))
+            elif entity == 'bot hobby':
+                print(chatbot_tools.random_output('bot hobby'))
+            elif entity == 'talk request':
+                print(chatbot_tools.random_output('talk request').replace('<user-name>', user_data['first name']))
+            elif entity == 'question bot':
+                print(chatbot_tools.random_output('question').replace('<user-name>', user_data['first name']))
+            elif entity == 'something':
+                print(chatbot_tools.random_output('something'))
+            elif entity == 'not talking bot':
+                print(chatbot_tools.random_output('not talking bot').replace('<user-name>', user_data['first name']))
+            elif entity == 'bot live forever':
+                print(chatbot_tools.random_output('bot live forever'))
+            elif entity == 'bot favourite':
+                print(chatbot_tools.random_output('bot favourite'))
+            elif entity == 'created':
+                print(chatbot_tools.random_output('created'))
+            elif entity == 'gender':
+                print(chatbot_tools.random_output('gender'))
+            elif entity == 'bot version':
+                with open('data/version.txt', 'r') as f:
+                    version = f.read()
+                print(chatbot_tools.random_output('version'))
+            elif entity == 'user thinking':
+                print(chatbot_tools.random_output('user thinking'))
+            elif entity == 'knowledge about user':
+                print('Here are the things that I know about you')
+                if user_data['first name'] != '':
+                    print(f"Your first name is {user_data['first name']}")
+                if user_data['middle name'] != '':
+                    print(f"Your middle name is {user_data['middle name']}")
+                if user_data['surename'] != '':
+                    print(f"Your surname is {user_data['surename']}")
+                if user_data['dob'] != '':
+                    print(f"Your date of birth is {user_data['dob']}")
+                if user_data['nickname'] != '':
+                    print(f"Your nickname is {user_data['nickname']}")
+                if user_data['hobbies/interest'] != '':
+                    print(f"These are your hobbies and interests {user_data['hobbies/interests']}")
+                if user_data['favourite song'] != '':
+                    print(f"Your favourite song is {user_data['favourite song']}")
+                if user_data['favourite music genre'] != '':
+                    print(f"Your favourite music genre is {user_data['favourite music genre']}")
+                if user_data['favourite film'] != '':
+                    print(f"Your favourite film is {user_data['favourite film']}")
+                if user_data['favourite food'] != '':
+                    print(f"Your favourite food is {user_data['favourite food']}")
+                if user_data['favourite book'] != '':
+                    print(f"Your favourite book is {user_data['favourite book']}")
+                if user_data['disliked food'] != '':
+                    print(f"You dislike {user_data['disliked food']}")
+                if user_data['disabilities'] != '':
+                    print(f"You have {user_data['disability']}")
+                if user_data['number of pets'] != '':
+                    print(f"You have {user_data}")
+                if user_data['name of pets'] != '':
+                    print(f"The name of your pets are {user_data['name of pets']}")
+                if user_data['places visited'] != '':
+                    print(f"The places you have visited are {user_data['places visited']}")
+            elif entity == 'time':
+                tell_time()
+            elif entity == 'date':
+                tell_date()
+            elif entity == 'day':
+                tell_day()
+            elif entity == 'month':
+                tell_month()
+            elif entity == 'year':
+                tell_year()
+            elif entity == 'movie release':
+                user_input = user_input.lower().lstrip().replace('when', '').replace('did', '').replace('release', '').replace('released', '').replace('was', '')
+                movie.collect_data(user_input, movie.release)
+            elif entity == 'weather monday':
+                weather_day('monday')
+            elif entity == 'weather tuesday':
+                weather_day('tuesday')
+            elif entity == 'weather wednesday':
+                weather_day('wednesday')
+            elif entity == 'weather thrusday':
+                weather_day('thrusday')
+            elif entity == 'weather friday':
+                weather_day('friday')
+            elif entity == 'weather saturday':
+                weather_day('saturday')
+            elif entity == 'weather sunday':
+                weather_day('sunday')      
+            elif entity == 'weather hour':
+                weather_hour_advanced()
+            elif entity == 'movie rate':
+                user_input = user_input.replace('what', '').replace('is', '').replace('rating' , '').replace('of', '').replace('for', '').replace('the', '').lstrip().rstrip().title()
+                movie.collect_data("The " + user_input, movie.rate)
+            elif entity == 'movie runtime':
+                user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('run', '').replace('time', '').replace('of', '').replace('for', '').lstrip().strip().title()
+                movie.collect_data("The " + user_input, movie.runtime)
+            elif entity == 'movie genre':
+                user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('genre', '').replace('of', '').lstrip().rstrip().title()
+                movie.collect_data("The " + user_input, movie.genre)
+            elif entity == 'movie director':
+                user_input = user_input.replace('who', '').replace('is', '').replace('director', '').replace('directed', '').replace('for', '').replace('of', '').replace('was', '').lstrip().rstrip().title()
+                movie.collect_data(user_input, movie.director)
+            elif entity == 'movie writer':
+                user_input = user_input.replace('who', '').replace('wrote', '').replace('is', '').replace('writer', '').replace('for', '')
+                movie.collect_data(user_input, movie.writer)
+            elif entity == 'movie actor':
+                user_input = user_input.replace('actors', '').replace('acted', '').replace('for', '').replace('who', '').replace('in', '').replace('actor', '').replace('is', '').replace('the', '')
+                movie.collect_data(user_input, movie.actor)
+            elif entity == 'movie plot':
+                user_input = user_input.replace('what', '').replace('is', '').replace('the', '').replace('plot', '').replace('of', '').rstrip().lstrip().title()
+                movie.collect_data(user_input, movie.plot)
+            elif entity == 'languages':
+                user_input = user_input.replace('what', '').replace('languages', '').replace('language', '').replace('in', '').repalce('are', '').rstrip().lstrip().title()
+                movie.collect_data(user_input, movie.languages)
+            elif entity == 'awards':
+                user_input = user_input.replace('what', '').replace('award', '').replace('awards', '').replace('did', '').replace('win', '').rstrip().lstrip().title()
+                movie.collect_data(user_input, movie.awards)
+            elif entity == 'specific weather location':
+                user_input = user_input.split('for ')
+                weather_for_area(user_input[1])
+            elif entity == 'latest news':
+                read_latest_news()
+            elif entity == 'scan open website':
+                website_url = copy_website_url()
+                scan_url(website_url)
+            elif entity == 'scan copied website':
+                website_url = get_copied_text()
+                scan_url(get_copied_text)
+            elif entity == 'space news':
+                read_space_news()
+            elif entity == 'search':
+                search_food(user_input.replace('show', '').replace('recipies', '').replace('search', '').replace('for', '').replace('how', '').replace('to', '').replace('bake', '').replace('cook', '').rstrip().lstrip())
+            elif entity == 'ingredients':
+                search_food_ingriedents(user_input.replace('ingredients', '').replace('ingredients', '').replace('for', ''))
+            elif entity == 'meal suggestion':
+                suggest_meal()
+            else:
+                if entity == 'positive' or entity == 'negative':
                     chatbot_tools.big_guns(user_input)
+                    return 'reload data'
+                else:
+                    print(entity)
   
     def find_intent(user_input, ET_data):
         try:
@@ -744,44 +841,44 @@ class models():
             
     def preprocess_data():
         start = time.time()
-        
+    
         vectorizer = TfidfVectorizer(token_pattern=r'\b\w+\b')
         classifier = LinearSVC()
-        
-        df = pd.read_csv('data/ET.csv')
-        pos_neg_data = pd.read_csv('data/SR.csv')
-        
+    
+        df = pd.read_csv('data/datasets/ET.csv')
+        pos_neg_data = pd.read_csv('data/datasets/SR.csv')
+    
         combined_data1 = pd.concat([df['name'], pos_neg_data['text']], axis=0, ignore_index=True)
         combined_data2 = pd.concat([df['ET'], pos_neg_data['sentiment']], axis=0, ignore_index=True)
-        
+    
         x_train = combined_data1.tolist()
         y_train = combined_data2.tolist()
 
         X_train = [process_text_tools.preprocess_text(text) for text in x_train]
-        
+    
         X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
-        
+    
         x_train_vectorized = vectorizer.fit_transform(X_train)
         x_test_vectorized = vectorizer.transform(X_test)
-        
+    
         classifier.fit(x_train_vectorized, y_train)
-        
+    
         #emotion recognizer
-        emotion_data = pd.read_csv('data/ER.csv')
-        
+        emotion_data = pd.read_csv('data/datasets/ER.csv')
+    
         er_x_train = emotion_data['text']
         er_y_train = emotion_data['emotion']
-        
+    
         er_vectorizer = TfidfVectorizer()
         x_train_er_vectorized = er_vectorizer.fit_transform(er_x_train)
-        
+    
         er_classifier = SVC(kernel='linear')
         er_classifier.fit(x_train_er_vectorized, er_y_train)
-        
+    
         end = time.time()
         write_to_log('Time taken to preprocess data: ' + str(end-start))
-        
-        return vectorizer, classifier, er_vectorizer, er_classifier#, pn_vectorizer, pn_classifier
+    
+        return vectorizer, classifier, er_vectorizer, er_classifier
     
     def find_matched_keywords(user_input, vectorizer, threshold=0.5):
         try:
@@ -793,12 +890,12 @@ class models():
             return matched_keywords
         except Exception as e:
             return user_input
-
+        
 #stored info about what was remembered about all the user's inputs
 conversation_data = [['','','']]
 
 #entity tag data
-ET_data = pd.read_csv('data/ET.csv')
+ET_data = pd.read_csv('data/datasets/ET.csv')#datasets/datatsets
 
 #emotion based on positive, netrual, and negative emotions
 positive_emotions = ['happy', 'love']
@@ -815,13 +912,15 @@ with open('data/new user.txt', 'r') as f:
         print(chatbot_tools.random_output('welcome user'))
 
 run_loop = True
+
 while run_loop is True:
     user_input = input('Input >>> ')
-    models.process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier)
+    process = models.process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier)  
+        
+    if process == 'reload data': #if the bot learns from wolfram alpha then it returns 'reload data' for it load the data model in again (takes around 1.5 seconds)
+        vectorizer, classifier, er_vectorizer, er_classifier = models.preprocess_data()
 
 ###for any code that is temp search for ***
 #TODO: Need to add bot birthday output once completed version, including it's age
-#TODO: Need to be able to ask the user questions about themselves
-#TODO: Work on the list of all the other apis in the other downloaded file
-#TODO: Get it to cache the wolfram alpha outputs meaning that this bot can learn new inputs/outputs without the need to call on wolfram alpha, do not cache math questions
-#iChF0rDovQfg2Kf787UiAGKB4QHOBLK2aSrSp6mA8PSGhzVe
+#TODO: Need to be able to ask the user questions about themselves - (only once speech recognition in place)
+#TODO: Try to reduce the amount of files there is

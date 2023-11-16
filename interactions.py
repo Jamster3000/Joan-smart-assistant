@@ -1,7 +1,5 @@
-import random, webbrowser, html, requests, json, datetime
-from nltk.corpus.reader import udhr
+import random, requests, json, datetime
 import pandas as pd
-from youtubesearchpython import VideosSearch
 from tools import *
 
 weather_api_key = 'F7DxhfQx1EoPuopgN59Tq0OkGRJwVkWQ'
@@ -11,6 +9,9 @@ class bordem_entertainment():
         print(chatbot_tools.random_output('play which game'))
     
     def play_video():
+        from youtubesearchpython import VideosSearch
+        import webbrowser
+        
         user_video = input(chatbot_tools.random_output('which video') + '\n>>> ')
         videoResults = VideosSearch(user_video, limit=1)
         webbrowser.open(videoResults.result()['result'][0]['link'])
@@ -151,13 +152,16 @@ class games():
         print(chatbot_tools.random_output('play blackjack again'))
         
     def open_wiki_game():
+        import webbrowser
         webbrowser.open('https://www.thewikigame.com/group')
     
     def xkcd():
+        import webbrowser
         number = random.randint(0, 2801)
         webbrowser.open(f"https://xkcd.com/{number}/")
     
     def akinator():
+        import webbrowser
         webbrowser.open('https://en.akinator.com/theme-selection')
     
     def game_list():
@@ -165,7 +169,7 @@ class games():
         print(chatbot_tools.random_output('list playable games').replace('<list-games>', games))
 
 def tell_joke():
-    jokes_data = pd.read_csv('data/jokes.csv')
+    jokes_data = pd.read_csv('data/datasets/jokes.csv')
     
     random_joke = jokes_data.iloc[random.randint(0, len(jokes_data))]
     
@@ -183,7 +187,7 @@ def tell_joke():
     
 def tell_riddle():
     user_data = chatbot_tools.get_user_data()
-    riddles_data = pd.read_csv('data/riddles.csv')
+    riddles_data = pd.read_csv('data/datasets/riddles.csv')
 
     random_riddle = riddles_data.iloc[random.randint(0, len(riddles_data))]
     riddle_question = random_riddle['question']
@@ -196,6 +200,8 @@ def tell_riddle():
         print(chatbot_tools.random_output('incorrect riddle').replace('<user-name>', user_data['first name']).replace('<riddle-answer>', riddle_answer))
 
 def trivia_quiz(number_of_questions):
+    import html
+    
     #create a dictionary of all the questions ranking from easy to hard
     questions_by_difficulty = {'easy': [], 'medium': [], 'hard': []}
     
@@ -204,7 +210,7 @@ def trivia_quiz(number_of_questions):
         f.write(str(number_of_questions))
     
     #open the json file of questions and answers
-    with open('data/trivia.json', 'r') as f:
+    with open('data/datasets/trivia.json', 'r') as f:
         trivia_questions = json.load(f)
     
     for q in trivia_questions:
@@ -252,7 +258,7 @@ def trivia_quiz(number_of_questions):
             i += 1
     
 def facts():
-    with open('data/facts.txt', 'r') as f:
+    with open('data/datasets/facts.txt', 'r') as f:
         read = f.read().splitlines()
         
         print(chatbot_tools.random_output('give fact'))
@@ -262,26 +268,12 @@ def wikihow():
     print(chatbot_tools.random_output('wikihow random'))
     
 def factory_reset():
-    files_to_empty = ['expected context.txt', 'last time used.txt', 'log.txt', 'quiz difficulty.txt', 'user passcode.txt', 'wiki links.txt']
-    csv_to_empty = ['conversation.csv']    
+    files_to_empty = ['expected context.txt', 'last time used.txt', 'log.txt', 'quiz difficulty.txt', 'user passcode.txt', 'wiki links.txt']  
 
     #make sure all txt data files are emptied
     for file in files_to_empty:
         with open('data/' + file, 'w') as f:
             f.write('')
-    
-    #forgetting all conversations made
-    header = None
-    data = []
-    with open('data/conversation.csv', 'r') as csv_file:
-        reader = csv.reader(csv_file)
-        header = next(reader)
-        for row in reader:
-            data.append(row)
-
-    with open('data/' + file, 'w', newline='') as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerow(header)
        
     #forgetting user data
     with open('data/user data.csv', 'r', newline='') as file:
@@ -492,7 +484,7 @@ def tell_year():
 class movie():
     def read_movie_data():
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 return data
         except Exception as e:
@@ -544,7 +536,7 @@ class movie():
             
                             try:
                                 #reads currently collected data
-                                with open('data/movie data.json', 'r') as f:
+                                with open('data/datasets/movie data.json', 'r') as f:
                                     movie_data = json.load(f)
                             except:
                                 pass
@@ -566,7 +558,7 @@ class movie():
                             movie_data[title] = collected_data
             
                             #writes all previous and new data to file
-                            with open('data/movie data.json', 'w') as f:
+                            with open('data/datasets/movie data.json', 'w') as f:
                                 json.dump(movie_data, f, indent=4)
                         else:
                             print(response.status_code)
@@ -590,13 +582,13 @@ class movie():
 
     def rate(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
             
                 movie_data = data[user_input]
                 return(f"{user_input} is rated {movie_data['rated']}")
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
             
                 movie_data = data["The " + user_input]
@@ -604,13 +596,13 @@ class movie():
         
     def runtime(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
             
                 movie_data = data[user_input]
                 return f"{user_input} runs for {movie_data['runTime'].replace('min', 'minutes')}"
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
             
                 movie_data = data["The " + user_input]
@@ -618,13 +610,13 @@ class movie():
     
     def genre(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data[user_input]
                 return f"The genre for {user_input} is {movie_data['genre']}"
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data["The " + user_input]
@@ -632,7 +624,7 @@ class movie():
      
     def director(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data[user_input]
@@ -640,7 +632,7 @@ class movie():
                 directors = ", ".join(list_of_directors[:-1]) + " and " + list_of_directors[-1]
                 return f"The directors for {user_input} are {directors}"
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data["The " + user_input]
@@ -650,7 +642,7 @@ class movie():
         
     def writer(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data[user_input]
@@ -658,7 +650,7 @@ class movie():
                 writers = ", ".join(list_of_writer[:-1]) + " and " + list_of_writer[-1]
                 return f"The directors for {user_input} are {writers}"
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data["The " + user_input]
@@ -668,7 +660,7 @@ class movie():
                                       
     def actor(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data[user_input]
@@ -676,7 +668,7 @@ class movie():
                 actors = ", ".join(list_of_actors[:-1]) + " and " + list_of_actors[-1]
                 return f"The actors for {user_input} are {actors}"
         except Exception as e:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data["The " + user_input]
@@ -686,14 +678,14 @@ class movie():
             
     def plot(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data[user_input]
                 plot = movie_data['plot']
                 return f"The plot of {user_input} is: {plot}"
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data["The " + user_input]
@@ -702,7 +694,7 @@ class movie():
     
     def languages(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data[user_input]
@@ -710,7 +702,7 @@ class movie():
                 languages = ", ".join(list_of_languages[:-1]) + " and " + list_of_languages[-1]
                 return f"The languages for {user_input} are {languages}"
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data["The " + user_input]
@@ -720,14 +712,14 @@ class movie():
     
     def awards(user_input):
         try:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data[user_input]
                 awards = movie_data['awards']
                 return f"The awards for {user_input} is: {awards}"
         except KeyError:
-            with open('data/movie data.json', 'r') as f:
+            with open('data/datasets/movie data.json', 'r') as f:
                 data = json.load(f)
                 
                 movie_data = data["The " + user_input]
@@ -741,3 +733,120 @@ def read_latest_news():
         print(chatbot_tools.random_output('read article'))
     else:
         print(chatbot_tools.random_output('no internet'))
+
+def read_space_news():
+    internet = check_internet()
+    
+    if internet == 0:
+        print(chatbot_tools.random_output('read space article'))
+    else:
+        print(chatbot_tools.random_output('no internet'))
+
+def scan_url(website):
+    url = "https://www.virustotal.com/vtapi/v2/url/scan"
+
+    payload = {
+        "url": website,
+        "apikey": "72f45ce5dc2e31acfa8362afca81da27f35f6918e90e0caa3b49da9c01c6eb23"
+    }
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    response = requests.post(url, data=payload, headers=headers)
+    if response.status_code == 200:
+        print(chatbot_tools.random_output('wait for scanning'))
+        get_scan_result(url)
+    else:
+        print(chatbot_tools.random_output('scanning failed'))
+        
+def get_scan_result(url):
+    url = 'https://www.virustotal.com/vtapi/v2/url/report'
+
+    params = {'apikey': '72f45ce5dc2e31acfa8362afca81da27f35f6918e90e0caa3b49da9c01c6eb23', 'resource':url}
+
+    response = requests.get(url, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        
+        number_of_unsafe_scans = data['positives']
+        
+        if number_of_unsafe_scans > 3 and number_of_unsafe_scans < 6: #might be unsafe but is unlikley
+            print(chatbot_tools.random_output('maybe safe website scan').replace('<unsafe-scans>', str(number_of_unsafe_scans)))
+        elif number_of_unsafe_scans >= 6:#unsafe don't visit
+            print(chatbot_tools.random_output('unsafe website'))
+        else:#completley safe
+            print(chatbot_tools.random_output('safe website scan'))
+            
+def search_food(food):
+    matching_recipe = recipe_by_title(food)
+    try:
+        print(matching_recipe[0]['strMeal'])
+    
+        ingedients = []
+        iterable_number = 1
+
+        for i in matching_recipe[0]:
+            try:
+                if matching_recipe[0]["strIngredient" + str(iterable_number)] != '':
+                    ingedients.append(matching_recipe[0]["strIngredient" + str(iterable_number)])
+                    iterable_number += 1
+            except:
+                pass
+    
+        print("Required Ingredients")
+        print('\n'.join(ingedients) + "\n")   
+        print(matching_recipe[0]['strInstructions'])
+    except TypeError:
+        pass
+
+def search_food_ingriedents(food):
+    matching_recipe = recipe_by_title(food)
+    print(matching_recipe[0]['strMeal'])
+    
+    ingedients = []
+    iterable_number = 1
+
+    for i in matching_recipe[0]:
+        try:
+            if matching_recipe[0]["strIngredient" + str(iterable_number)] != '':
+                ingedients.append(matching_recipe[0]["strIngredient" + str(iterable_number)])
+                iterable_number += 1
+        except:
+            pass
+    
+    print("Required Ingedients")
+    print('\n'.join(ingedients) + "\n")   
+    
+def random_food():
+    with open('data/datasets/recipies.json', 'r') as f:
+        data = json.load(f)
+        
+        try:
+            random_recipe = random.choice(data)
+            random_meal = random.choice(random_recipe["meals"])
+
+            # Access details of the random meal
+            meal_name = random_meal["strMeal"]
+            meal_category = random_meal["strCategory"]
+            meal_instructions = random_meal["strInstructions"]
+
+            print(meal_name)
+            print(chatbot_tools.random_output('more info on food'))
+            
+            with open('data/tempFile.txt', 'w') as f:
+                f.write(meal_name)
+        except TypeError:
+            random_food()
+
+def suggest_meal():
+    user_data = chatbot_tools.get_user_data()
+    
+    if user_data['favourite food'] != '':
+        print(chatbot_tools.random_output('suggest favourite food'))
+        search_food(user_data['favourite food'])
+    else:
+        print(chatbot_tools.random_output('suggest random food'))
+        random_food()
