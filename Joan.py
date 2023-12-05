@@ -505,9 +505,8 @@ class models():
                 
             intent = models.find_intent(user_input, ET_data)
                 
-            conversation_data[0][0] = user_input
-            conversation_data[0][2] = entity
-                
+            ###The main if, elif, else statements for the ET data
+
             try:
                 ET_data.set_index('name', inplace=True)
             except KeyError:
@@ -515,6 +514,19 @@ class models():
             
             print(entity)#***
             if entity == 'greeting':
+                remember_data = pd.read_csv('data/userRemember.csv')
+                
+                for index, row in remember_data.iterrows():
+                    if row['when'] == 'hi':
+                        if 'water' in row['remember']:
+                            print('Remember', row['remember'])
+                            break
+                        else:
+                            remember_data = remember_data.drop(index, axis=0)
+                            remember_data.to_csv('data/userRemember.csv')
+                            print('Remember', row['remember'])
+                            break
+                    
                 greeting_response(user_input)
             elif entity == 'been while':
                 been_while()
@@ -562,6 +574,19 @@ class models():
             elif entity == 'descrive wiki game':
                 print(chatbot_tools.random_output('explain wiki game'))
             elif entity == 'bye':
+                remember_data = pd.read_csv('data/userRemember.csv')
+                
+                for index, row in remember_data.iterrows():
+                    if row['when'] == 'bye':
+                        if 'water' in row['remember']:
+                            print('Remember', row['remember'])
+                            break
+                        else:
+                            remember_data = remember_data.drop(index, axis=0)
+                            remember_data.to_csv('data/userRemember.csv')
+                            print('Remember', row['remember'])
+                            break
+                
                 print(chatbot_tools.random_output('bye').replace('<user-name>', user_data['first name']))
             elif entity == 'thank':
                 print(chatbot_tools.random_output('thank').replace('<user-name>', user_data['first name']))
@@ -611,7 +636,11 @@ class models():
             elif entity == 'weather tomorrow':
                 weather_tomorrow()
             elif entity == 'weather day':
-                weather_day()
+                days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+                for day in days_of_week:
+                    if day in user_input:   
+                        weather_day(day)
+                        break
             elif entity == 'choose youtube video':
                 internet = check_internet()
                 if internet == 0:
@@ -674,8 +703,6 @@ class models():
                 print(chatbot_tools.random_output('change bot name'))
             elif entity == 'real or not':
                 print(chatbot_tools.random_output('real or not'))
-            elif entity == 'where':
-                print(chatbot_tools.random_output('where').replace('<user-name>', user_data['first name']))
             elif entity == 'last night':
                 print(chatbot_tools.random_output('last night'))
             elif entity == 'what doing':
@@ -811,19 +838,84 @@ class models():
                 scan_url(get_copied_text)
             elif entity == 'space news':
                 read_space_news()
+            elif entity == 'remember':
+                memory.remember(user_input)
+                return 'reload data'
             elif entity == 'search':
                 search_food(user_input.replace('show', '').replace('recipies', '').replace('search', '').replace('for', '').replace('how', '').replace('to', '').replace('bake', '').replace('cook', '').rstrip().lstrip())
             elif entity == 'ingredients':
                 search_food_ingriedents(user_input.replace('ingredients', '').replace('ingredients', '').replace('for', ''))
             elif entity == 'meal suggestion':
                 suggest_meal()
+            elif entity == 'where object':
+                remember = pd.read_csv('data/userRemember.csv')
+
+                for index, row in remember.iterrows():
+                    keyword = row['output'].split('***')
+                    if keyword[0] in user_input:
+                        print(keyword[1])#this is the sentence rather than the keyword
+                
+                        #remove from the userRemember.csv
+                        remember = remember.drop(index, axis=0)
+                        remember.to_csv('data/userRemember.csv')
+                        
+                        ET = pd.read_csv('data/datasets/ET.csv')
+                        ET = ET[~ET['name'].str.contains(user_input.split()[-1], case=False)]
+                        ET.to_csv('data/datasets/ET.csv', index=False)
+                return 'reload data'
             else:
                 if entity == 'positive' or entity == 'negative':
-                    chatbot_tools.big_guns(user_input)
-                    return 'reload data'
+                    if user_input.startswith('remember'):# if input starts with remember then user must be asking to remember something
+                        memory.remember(user_input)
+                        return 'reload data'
+                    else:
+                        chatbot_tools.big_guns(user_input)
+                        return 'reload data'
                 else:
-                    print(entity)
-  
+                    if user_input.startswith('remember'):
+                        memory.remember(user_input)
+                        return 'reload data'
+                    else:
+                        print(entity)
+            
+            #checks if the timer is still running
+            if not timer.is_alive():
+                remember_data = pd.read_csv('data/userRemember.csv')
+                
+                for index, row in remember_data.iterrows():
+                    if row['when'] == 'timer' or row['when'] == 'hi':
+                        print('Also remember', row['remember'])
+                
+                        user_response_to_reminder = input('Input >>> ')
+                
+                        user_response_to_reminder = user_response_to_reminder.lower().translate(str.maketrans("","",string.punctuation))
+
+                        matched_keywords = models.find_matched_keywords(user_response_to_reminder, vectorizer, threshold=0.6)
+        
+                        text = process_text_tools.preprocess_text(user_response_to_reminder)
+                        text_vectorized = vectorizer.transform([text])
+                        entity = classifier.predict(text_vectorized)[0]
+                        print(entity)
+                        if entity == 'later' or entity == 'negative':
+                            print(chatbot_tools.random_output('remind later').replace('<user-name>', user_data['first name']))
+                        elif entity == 'thank':
+                            if 'water' not in row['remember']:
+                                remember_data = remember_data.drop(index, axis=0)
+                                remember_data.to_csv('data/userRemember.csv')#assume user is going to do it, remove
+                            break
+                        elif entity == 'forget':
+                            if 'water' not in row['remember']:
+                                remember_data = remember_data.drop(index, axis=0)
+                                remember_data.to_csv('data/userRemember.csv')
+                            print(chatbot_tools.random_output('forget').replace('<user-name>', user_data['first name']))
+                            break
+                        else:
+                            if 'water' not in row['remember']:
+                                remember_data = remember_data.drop(index, axis=0)
+                                remember_data.to_csv('data/userRemember.csv')
+                                process = models.process_input(user_response_to_reminder, vectorizer, classifier, er_vectorizer, er_classifier)
+                            break
+
     def find_intent(user_input, ET_data):
         try:
             user_inpuit = user_input.lower()
@@ -890,9 +982,203 @@ class models():
             return matched_keywords
         except Exception as e:
             return user_input
+
+class memory:   
+    def remember(user_input):
+        vectorizer, classifier = memory.load_data()
+        intent = memory.process_input(vectorizer, classifier, user_input)
         
-#stored info about what was remembered about all the user's inputs
-conversation_data = [['','','']]
+        user_input = text_tools.first_to_third(user_input)
+
+        memory.determine_intent(intent, user_input)
+        
+    def load_data():
+        data = pd.read_csv('data/datasets/rememberTrainingData.csv')
+
+        x_train = data['memory']
+
+        y_train = data['keyword']
+
+        vectorizer = TfidfVectorizer()
+        x_train_vectorized = vectorizer.fit_transform(x_train)
+
+        classifier = SVC(kernel='linear')
+        classifier.fit(x_train_vectorized, y_train)
+    
+        return vectorizer, classifier
+    
+    def process_input(vectorizer, classifier, query):
+        query_vectorized = vectorizer.transform([query])
+
+        intent = classifier.predict(query_vectorized)[0]
+    
+        return intent
+    
+    def determine_intent(intent, user_input):
+        '''
+        Determines what the intent of the user's remember input was
+        '''
+        
+        #list of all keywords in relation to what the user could say
+        intent_list = ['item location', 'completed acheivement', 'respond',
+                       'check email', 'pay bills', 'rubbish out',
+                       'set', 'charge phone', 'water',
+                       'precsription', 'return item', 'attend to pets']
+    
+        #list of keywords that are most likley to need reminding of before the user leaves
+        before_going_out = ['call', 'lock before leaving', 'turn off', 'charge phone',  
+                            'bags shopping', 'close windows', 'check keys', 'check wallet', 'attend to pets',
+                            'buy item', 'return item']
+        
+        after_coming_home = ['check email', 'respond', 'charge phone', 'attend to pets', 'call']
+
+        #running the functions in threads because they use ntlk for NLP which can be slow, so it can be done in the background instead
+        continue_loops = True
+        for i in before_going_out:
+            if intent == i:
+                continue_loops = False
+                going_out = threading.Thread(target=memory.going_out_thread, args=(user_input,))
+                going_out.start()
+
+                print('Of course, I will remember', user_input)
+                break
+            
+        for i in after_coming_home:
+            if intent == i:
+                continue_loops = False
+                coming_home = threading.Thread(target=memory.coming_home, args=(user_input,))
+                coming_home.start()
+                
+                print('Of course, I will remember', user_input)
+                break
+        
+        if continue_loops == True:
+            for i in intent_list:
+                if intent == i and i == 'item location':
+                    item_location_memory = threading.Thread(target=memory.item_location, args=(user_input,))
+                    item_location_memory.start()#runs in background
+                    
+                    #informs user of comfirmation
+                    print('Of course, I will remember', user_input)
+
+                    #stops for loop.
+                    break
+                    
+                elif intent == i and i in ['respond', 'call', 'check email', 'pay bills', 'rubbish out', 'set', 'charge phone', 'precsription', 'return item', 'attend to pets', 'water']:
+                    respond_memory = threading.Thread(target=memory.respond, args=(user_input,))
+                    respond_memory.start()#runs in background
+                    
+                    #informs user of confirmation
+                    print('Of course, I will remember', user_input)
+                    
+                    try:
+                        timer.start()
+                    except RuntimeError:pass
+                    #stops for loop
+                    break
+
+    def coming_home(user_input):
+        remember_data = pd.read_csv('data/userRemember.csv')#load data file
+        new_row = {'remember': user_input, 'when': 'hi', 'output': 'None'}#prepare the new row
+        remember_data.loc[len(remember_data)] = new_row#create a new row for the data
+        remember_data.to_csv('data/userRemember.csv', index=False)#append to the csv file
+    
+    def respond(user_input):
+        '''
+        remind the user to respond to a specific contact type (e.g., email, whatsapp, message, etc.)
+        '''
+        remember = pd.read_csv('data/userRemember.csv')
+        
+        contact_type, person = memory.contact_pos_tag(user_input)
+
+        if person == '':
+            new_row = {'remember': user_input, 'when': 'timer', 'output': 'Reminder that you need to ' + contact_type + ' someone.'}
+        else:
+            new_row = {'remember': user_input, 'when': 'timer', 'output': 'Reminder that you need to ' + contact_type + person}
+        
+        remember.loc[len(remember)] = new_row
+        remember.to_csv('data/userRemember.csv', index=False)
+    
+    def going_out_thread(user_input):
+        remember_data = pd.read_csv('data/userRemember.csv')#load data file
+        new_row = {'remember': user_input, 'when': 'bye', 'output': 'None'}#prepare the new row
+        remember_data.loc[len(remember_data)] = new_row#create a new row for the data
+        remember_data.to_csv('data/userRemember.csv', index=False)#append to the csv file
+    
+    def item_location(user_input):
+        remember_data = pd.read_csv('data/userRemember.csv')
+        ET_data = pd.read_csv('data/datasets/ET.csv')
+
+        pos_tag = memory.pos_tagging(user_input)
+        if pos_tag != "error":
+            new_row = {'remember': user_input, 'when': 'None', 'output': pos_tag}#prepare the new row
+            remember_data.loc[len(remember_data)] = new_row#create a new row for the data
+            remember_data.to_csv('data/userRemember.csv', index=False)#append to the csv file
+            
+            new_ET_row = {'name': 'where is ' + pos_tag.split('***')[0], 'ET': 'where object'}
+            ET_data.loc[len(ET_data)] = new_ET_row
+            ET_data.to_csv('data/datasets/ET.csv', index=False)
+            
+            return 'reload data'
+    
+    def contact_pos_tag(user_input):
+        from nltk import pos_tag, ne_chunk, word_tokenize, Tree
+        
+        words = word_tokenize(user_input)
+        tags = pos_tag(words)
+        tree = ne_chunk(tags)
+
+        contact_type = []
+        
+        for subtree in tree:
+            if isinstance(subtree, tuple):
+                word, pos = subtree
+                if pos == 'VB':
+                    contact_type.append(word)
+        
+        name = user_input.split(contact_type[0])[1]
+        return ''.join(contact_type), name
+    
+    def pos_tagging(user_input):
+        from nltk import pos_tag, ne_chunk, word_tokenize
+        
+        words = word_tokenize(user_input)
+        tags =  ne_chunk(pos_tag(words))
+        
+        item_and_location = []
+        NNS = False
+
+        for i in range(len(tags)):
+            if tags[i][1] == 'NN' or tags[i][1] == 'NNS':
+                if tags[i][1] == 'NNS':
+                    NNS = True
+                if tags[i-2][1] == 'IN':
+                    item_and_location.append(tags[i-2][0])
+            
+                if tags[i-1][1] == 'DT':
+                    item_and_location.append(tags[i-1][0])
+            
+                item_and_location.append(tags[i][0])
+                
+        try:
+            if NNS is True:
+                return f"{item_and_location[0]}***Your {item_and_location[0]} are {item_and_location[1]} {item_and_location[2]} {item_and_location[3]}"
+            else:
+                return f"{item_and_location[0]}***Your {item_and_location[0]} is {item_and_location[1]} {item_and_location[2]} {item_and_location[3]}"
+        except IndexError:
+            print(chatbot_tools.random_output('cannot find pos tag'))
+            return 'error'
+
+def blank_function():
+    '''
+    This is the only way of getting a background timer that seems to work as I want it throughout the entire program
+    because threading.Timer requires a function (which is not desired) then this blank function that doesn't do anything 
+    works as a decoy
+    '''
+    pass
+
+#timer = threading.Timer(random.randint(900, 2400), blank_function)
+timer = threading.Timer(12.00, blank_function)
 
 #entity tag data
 ET_data = pd.read_csv('data/datasets/ET.csv')#datasets/datatsets
@@ -904,6 +1190,7 @@ negative_emotions = ['sad', 'anger', 'fear', 'unhappy']
 
 vectorizer, classifier, er_vectorizer, er_classifier = models.preprocess_data()
 
+#outputs different depending on whether the user is new or not to the program
 with open('data/new user.txt', 'r') as f:
     read = f.read()
     if read == 'true':
@@ -916,11 +1203,15 @@ run_loop = True
 while run_loop is True:
     user_input = input('Input >>> ')
     process = models.process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier)  
-        
+
     if process == 'reload data': #if the bot learns from wolfram alpha then it returns 'reload data' for it load the data model in again (takes around 1.5 seconds)
         vectorizer, classifier, er_vectorizer, er_classifier = models.preprocess_data()
 
 ###for any code that is temp search for ***
 #TODO: Need to add bot birthday output once completed version, including it's age
 #TODO: Need to be able to ask the user questions about themselves - (only once speech recognition in place)
-#TODO: Try to reduce the amount of files there is
+#TODO: be able to allow the user to create a rountine to be reminded of
+#TODO: Add built in calendar which can be used to remind the user of things on specific dates.
+
+###list of things to add for it to remember
+#take tablets (morning, afternoon, evening, night)

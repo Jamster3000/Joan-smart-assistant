@@ -20,7 +20,7 @@ class process_text_tools():
         text = re.sub(r'[^\w\s]', '', text)
         return text
 
-class chatbot_tools():
+class chatbot_tools():       
     def extract_website_name(url):
         import re
         
@@ -50,7 +50,7 @@ class chatbot_tools():
 
                     ET_pd = pd.read_csv('data/datasets/ET.csv')#load csv file
                     
-                    new_data = {'name': user_input.lower().lstrip().rstrip(), 'ET': answer}
+                    new_data = {'name': user_input.lower().lstrip().rstrip(), 'ET': answer.replace('\n', '\\n')}
                     
                     ET_pd.loc[len(ET_pd)] = new_data
                     ET_pd.to_csv('data/datasets/ET.csv', index=False)
@@ -274,6 +274,24 @@ class chatbot_tools():
             return random_output
 
 class text_tools():
+    def first_to_third(input_string):
+        # Split the input string into words
+        words = input_string.replace('remember ', '').split()
+
+        # Define a dictionary to map first-person pronouns to third-person pronouns
+        pronoun_mapping = {
+            'i': 'you', 'my': 'your', 'me': 'you', 'myself': 'yourself'}
+
+        # Iterate through the words and replace first-person pronouns
+        for i in range(len(words)):
+            if words[i] in pronoun_mapping:
+                words[i] = pronoun_mapping[words[i]]
+
+        # Join the words back into a string
+        output_string = ' '.join(words)
+
+        return output_string
+
     def prepare_text(text):
         sentences = sent_tokenize(text)#nltk
         sentences = [word_tokenize(sent) for sent in sentences]#nltk 

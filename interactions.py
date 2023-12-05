@@ -576,9 +576,12 @@ class movie():
             movie_data = movie_data[user_input]
             return (f"{user_input} was released in {movie_data['Year']}")
         except KeyError:
-            movie_data = movie.read_movie_data()    
-            movie_data = movie_data["The " + user_input]
-            print(f"The {user_input} was released in {movie_data['Year']}")
+            try:
+                movie_data = movie.read_movie_data()    
+                movie_data = movie_data["The " + user_input]
+                print(f"The {user_input} was released in {movie_data['Year']}")
+            except:
+                chatbot_tools.big_guns(user_input)
 
     def rate(user_input):
         try:
@@ -588,11 +591,14 @@ class movie():
                 movie_data = data[user_input]
                 return(f"{user_input} is rated {movie_data['rated']}")
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
             
-                movie_data = data["The " + user_input]
-                print(f"The {user_input} is rated {movie_data['rated']}")
+                    movie_data = data["The " + user_input]
+                    print(f"The {user_input} is rated {movie_data['rated']}")
+            except:
+                chatbot_tools.big_guns(user_input)
         
     def runtime(user_input):
         try:
@@ -602,11 +608,14 @@ class movie():
                 movie_data = data[user_input]
                 return f"{user_input} runs for {movie_data['runTime'].replace('min', 'minutes')}"
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
             
-                movie_data = data["The " + user_input]
-                print(f"The {user_input} runs for {movie_data['runTime'].replace('min', 'minutes')}")
+                    movie_data = data["The " + user_input]
+                    print(f"The {user_input} runs for {movie_data['runTime'].replace('min', 'minutes')}")
+            except:
+                chatbot_tools.big_guns(user_input)
     
     def genre(user_input):
         try:
@@ -616,11 +625,14 @@ class movie():
                 movie_data = data[user_input]
                 return f"The genre for {user_input} is {movie_data['genre']}"
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
                 
-                movie_data = data["The " + user_input]
-                print(f"The genre for The {user_input} is {movie_data['genre']}")
+                    movie_data = data["The " + user_input]
+                    print(f"The genre for The {user_input} is {movie_data['genre']}")
+            except:
+                chatbot_tools.big_guns(user_input)
      
     def director(user_input):
         try:
@@ -632,13 +644,16 @@ class movie():
                 directors = ", ".join(list_of_directors[:-1]) + " and " + list_of_directors[-1]
                 return f"The directors for {user_input} are {directors}"
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
                 
-                movie_data = data["The " + user_input]
-                list_of_directors = movie_data['director'].split(', ')
-                directors = ", ".join(list_of_directors[:-1]) + " and " + list_of_directors[-1]
-                print(f"The directors for The {user_input} are {directors}")
+                    movie_data = data["The " + user_input]
+                    list_of_directors = movie_data['director'].split(', ')
+                    directors = ", ".join(list_of_directors[:-1]) + " and " + list_of_directors[-1]
+                    print(f"The directors for The {user_input} are {directors}")
+            except:
+                chatbot_tools.big_guns(user_input)
         
     def writer(user_input):
         try:
@@ -650,13 +665,16 @@ class movie():
                 writers = ", ".join(list_of_writer[:-1]) + " and " + list_of_writer[-1]
                 return f"The directors for {user_input} are {writers}"
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
                 
-                movie_data = data["The " + user_input]
-                list_of_writer = movie_data['writer'].split(', ')
-                writers = ", ".join(list_of_writer[:-1]) + " and " + list_of_writer[-1]
-                print(f"The directors for The {user_input} are {writers}")
+                    movie_data = data["The " + user_input]
+                    list_of_writer = movie_data['writer'].split(', ')
+                    writers = ", ".join(list_of_writer[:-1]) + " and " + list_of_writer[-1]
+                    print(f"The directors for The {user_input} are {writers}")
+            except:
+                chatbot_tools.big_guns(user_input)
                                       
     def actor(user_input):
         try:
@@ -668,13 +686,16 @@ class movie():
                 actors = ", ".join(list_of_actors[:-1]) + " and " + list_of_actors[-1]
                 return f"The actors for {user_input} are {actors}"
         except Exception as e:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
                 
-                movie_data = data["The " + user_input]
-                list_of_actors = movie_data['actors'].split(', ')
-                actors = ", ".join(list_of_actors[:-1]) + " and " + list_of_actors[-1]
-                print(f"The actors for The {user_input} are {actors}")
+                    movie_data = data["The " + user_input]
+                    list_of_actors = movie_data['actors'].split(', ')
+                    actors = ", ".join(list_of_actors[:-1]) + " and " + list_of_actors[-1]
+                    print(f"The actors for The {user_input} are {actors}")
+            except:
+                chatbot_tools.big_guns(user_input)
             
     def plot(user_input):
         try:
@@ -685,12 +706,15 @@ class movie():
                 plot = movie_data['plot']
                 return f"The plot of {user_input} is: {plot}"
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
                 
-                movie_data = data["The " + user_input]
-                plot = movie_data['plot']
-                return f"The plot of The {user_input} is: {plot}"
+                    movie_data = data["The " + user_input]
+                    plot = movie_data['plot']
+                    return f"The plot of The {user_input} is: {plot}"
+            except:
+                chatbot_tools.big_guns(user_input)
     
     def languages(user_input):
         try:
@@ -702,13 +726,16 @@ class movie():
                 languages = ", ".join(list_of_languages[:-1]) + " and " + list_of_languages[-1]
                 return f"The languages for {user_input} are {languages}"
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
                 
-                movie_data = data["The " + user_input]
-                list_of_languages = movie_data['languages'].split(', ')
-                languages = ", ".join(list_of_languages[:-1]) + " and " + list_of_languages[-1]
-                print(f"The languages for The {user_input} are {languages}")
+                    movie_data = data["The " + user_input]
+                    list_of_languages = movie_data['languages'].split(', ')
+                    languages = ", ".join(list_of_languages[:-1]) + " and " + list_of_languages[-1]
+                    print(f"The languages for The {user_input} are {languages}")
+            except:
+                chatbot_tools.big_guns(user_input)
     
     def awards(user_input):
         try:
@@ -719,12 +746,15 @@ class movie():
                 awards = movie_data['awards']
                 return f"The awards for {user_input} is: {awards}"
         except KeyError:
-            with open('data/datasets/movie data.json', 'r') as f:
-                data = json.load(f)
+            try:
+                with open('data/datasets/movie data.json', 'r') as f:
+                    data = json.load(f)
                 
-                movie_data = data["The " + user_input]
-                awards = movie_data['awards']
-                print(f"The awards for The {user_input} is: {awards}")
+                    movie_data = data["The " + user_input]
+                    awards = movie_data['awards']
+                    print(f"The awards for The {user_input} is: {awards}")
+            except:
+                chatbot_tools.big_guns(user_input)
                 
 def read_latest_news():
     internet = check_internet()
@@ -850,3 +880,4 @@ def suggest_meal():
     else:
         print(chatbot_tools.random_output('suggest random food'))
         random_food()
+

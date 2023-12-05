@@ -27,6 +27,8 @@ list-games - a list of games that can be played with Joan
 unsafe-scans - the amount of scans that returned as a dangerous website
 
 food - food
+
+sure-name - the surename of the user
 ______________________________________________________________________________________________________________
 
 ###data files###

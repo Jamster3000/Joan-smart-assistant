@@ -11,7 +11,14 @@ afternoon,greeting
 good afternoon,greeting
 evening,greeting
 night,greeting
+remember ,remember
+remember close window,remember
+remember what ,remember
+remember to ,remember
+remember that, remember
+remember I ,remember
 bye,bye
+need leave,bye
 been while,been while
 how are you,how are you
 hello how are you, how are you
@@ -38,9 +45,6 @@ twenty one,play blackjack
 guessing game,play guessing game
 number guess game,play guessing game
 rock paper scissors,play rps
-play game,play game
-lets play a game,play game
-let play a game,play game
 random wikihow,random wikihow article
 give random wikihow article,random wikihow article
 wikihow article,random wikihow article
@@ -122,6 +126,8 @@ hit me with fact,fact
 play akinator,akinator
 open akinator,akinator
 let play game akinator,akinator
+play game,play game
+let play a game,play game
 what game you know,list games
 list game,list games
 list games you know,list games
@@ -209,8 +215,6 @@ are robot,robot
 are human,human
 change your name,change bot name
 are you real,real or not
-where are you,where
-where you be,where
 what you do night,last night
 what weather like for ,specific weather location
 what you do,what doing
@@ -300,7 +304,11 @@ search for ,search
 show recipies for ,search
 ingredients for ,ingredients
 suggest meal,meal suggestion
+later,later
+thanks reminding,thank
+forgot,forgot
+slip mind,forgot
+forget something,forget
 what does it mean,"pronoun | third-person singular personal pronoun, refers to one inanimate object or to one person or animal with no gender or unknown gender"
-thanls,You're welcome!
-amazing,"1 | adjective | surprising greatly
-2 | adjective | inspiring awe or admiration or wonder"
+the meaning  irregardless,adverb | regardless; a combination of irrespective and regardless sometimes used humorously
+by,"1 | adverb | so as to pass a given point\n2 | adverb | in reserve; not for immediate use\n3 | preposition | near or next to, beside, alongside, especially movement through the vicinity and then beyond; not later than, at some time before; to the specified amount or measurement; according to the method or manner of"

@@ -105,7 +105,6 @@ not robot,not robot,"I am not classed as a robot. Robots are typically capable o
 not human,not humnan,"I am not a human being. A human has flesh and a pysical body, I on the other hand do not have flesh nor do I have a pysical body to call my own. I am a smart assistant.",
 change bot name,change bot name,I applogise but I don't have a function to allow you to change my name.,"I am not able to change my name on request, I applogise about this."
 real or not,real or not,"I am real in the sense that I exist, otherwise you'd be talking to yourself. How silly.",I do exist and am real.
-where,where,I am right here <user-name>.,"I am here, on your device."
 last night,last night,"I did what I do and have always done, I waited until you needed my assistance.",
 what doing,what doing,"I am waiting until you require my assistance, <user-name>.","I am not doing anything in particular, just waiting until you need assistance."
 what next,what next,I am happy to do whatever you would like to do <user-name>.,"I am a smart assistant, the only thing I can do is assist you.",As a smart assistant I cannot have the desire to do something.,
@@ -135,3 +134,7 @@ newest space articles,read space article,"Showing you the newest space news arti
 suggest favourite food,suggest favourite food,"Here is a meal suggestion based on your food interests.","Here is a suggestion for you based on your favourite food."
 suggest food,suggest food,"Here is a meal suggestion for you.","Here is a meal suggest you could have to fill yourself."
 more info on food,info food,"How about <food>. Would you like me to provide you with instructions?","<food>. I thought of this suggestion for you, what do you think? Would you like me to provide you with instructions?"
+cannot find pos tag,no pos tag,"I am sorry, but I can't figrue out what you said.","I am sorry but I couldn't determine what you was saying. Please remember that I am only code and will make mistakes."
+forget,forget,"No worries, it happens to the best of us <user-name>, just try and get it done soon.","No worries, it happens the best of us <user-name>.","No worries, everyone forgets. I'm here to help you remember things.","No problem at all, it's what I'm here for, <user-name>","Don't worry forgetting things is human. Try to get it done when you can.","It's okay, we all have our moments.","It happens to everyone from time to time <user-name>, just get it done when you can."
+remind later,remind later,"Okay, please don't forget about it. I'll remind you later.","I'll remind you later <user-name>, don't forget it.","Remember that you need to do it sooner than later. Don't worry I'll remind you later.","No worries, <user-name> I'll remind you later."
+take break now,take break,"<user-name> <sure-name> You need to take a break soon. Please take a break even if it's a short one.","I have asked you to take a break. Please take one soon <user-name>","Please take a break soon. It is good to take short breaks."
