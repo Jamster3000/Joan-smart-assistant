@@ -1,7 +1,7 @@
 (Still working on)
 
 # Joan
-______________________________________________________________________________________________________________
+
 🤖 This is a smart assistant called "Joan". Being developed purposly for running on low resource systems, such as a raspberry pi. It uses machine learning (scikit-learn) rather than chatbot frameworks (such as tensorflow, chatterbot, etc.), which is much faster and allows for more control over how the assistant works. In addition to this, A.I. isn't used for this because it's easier to understand and know what's going on with machine learning than it is A.I. frameworks.
 
 In addition to the machine leaning it also uses several different APIs and more to come. None of these used API's have been paied for as they are free or use a free tier. A list of API's that are used:
