@@ -1,8 +1,19 @@
 (Still working on)
 
-# Joan
+# Joan 🤖 - Your smart assistant
 
-🤖 This is a smart assistant called `"Joan"`. Being developed purposly for running on low resource systems, such as a raspberry pi. It uses machine learning (scikit-learn) rather than chatbot frameworks (such as tensorflow, chatterbot, etc.), which is much faster and allows for more control over how the assistant works. In addition to this, A.I. isn't used for this because it's easier to understand and know what's going on with machine learning than it is A.I. frameworks.
+Welcome to `**Joan**`, a lightweight and resource-efficient smart assistant designed to run seamlessly on low-resource systems like Raspberry Pi. `**Joan**` leverages machine learning (scikit-learn) for speed and control, making it a user-friendly alternative to traditional chatbot frameworks. Unlike typical AI frameworks, `**Joan**` prioritizes transparency and simplicity for easy understanding.
+
+## Features 🚀
+- Play a game (blackjack or rock paper scissors
+- Ask it to open a specific video on `Youtube`
+- Tell a joke
+- Tell a riddle (doesn't give answer until you give up or guess)
+- Trivia (questions and answers)
+- Gives facts
+- Opens the wiki game for the user to play
+- Opens a random xkcd
+
 
 ## API's used:
 In addition to the machine leaning it also uses several different APIs and more to come. None of these used API's have been paied for as they are free or use a free tier. A list of API's that are used:
@@ -37,10 +48,6 @@ In addition to the machine leaning it also uses several different APIs and more 
 
 ## How To Use:
 To run this code open up `"Joan.py"` and run it, depending on your machine specs it should take anywhere from 3 (ish) to 5 seconds to import all the libraries and load and train the model.
-
-
-## List Of Things Currently Possible With `Joan`:
-- 
 
 ## "Responses.csv" Tags:
 <sub>Each tag is surrounded by "<" and ">"</sub>
