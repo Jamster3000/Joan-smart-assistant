@@ -4,6 +4,7 @@
 
 🤖 This is a smart assistant called "Joan". Being developed purposly for running on low resource systems, such as a raspberry pi. It uses machine learning (scikit-learn) rather than chatbot frameworks (such as tensorflow, chatterbot, etc.), which is much faster and allows for more control over how the assistant works. In addition to this, A.I. isn't used for this because it's easier to understand and know what's going on with machine learning than it is A.I. frameworks.
 
+## API's used:
 In addition to the machine leaning it also uses several different APIs and more to come. None of these used API's have been paied for as they are free or use a free tier. A list of API's that are used:
 - Wolfram  Alpha - Used to respond to anything that "Joan" can't or doesn't have a response for. Joan saves the answer allowing it to do "Live Learning".
 - Accuweather - Used to get weather data from a location (The user doesn't need to give "Joan" their location, It just knows).
@@ -16,10 +17,25 @@ In addition to the machine leaning it also uses several different APIs and more 
 - ipapi - This is used to get the user's IP data, which includes their current location.
 
 
+## Modules/libraries that are required to be installed:
+- Pandas
+- Scikit-learn
+- pywikihow
+- youtube-search-python
+- nltk
+- inflect
+- fuzzywuzzy
+- requests
+- pyperclip
+- pyautogui
+- word2number
+
+
+## How To Use:
+To run this code open up `#0969DA`"Joan.py" and run it, depending on your machine specs it should take anywhere from 3 (ish) to 5 seconds to import all the libraries and load and train the model.
 
 ## "Responses.csv" Tags:
 <sub>Each tag is surrounded by "<" and ">"</sub>
-ᴱᵃᶜʰ ᵗᵃᵍ ᶦˢ ˢᵘʳʳᵒᵘⁿᵈᵉᵈ ᵇʸ < ᵃⁿᵈ >
 
 - user-name - can include the user's name
 - date - Includes the date whether that is current date or some other date
@@ -33,8 +49,8 @@ In addition to the machine leaning it also uses several different APIs and more 
 - food - food
 - sure-name - the surename of the user
 
-## Data Files included:
 
+## Data Files included:
 - datasets/ET.csv - Entity tag, this is the main file for recognizing what the user has inputted.
 - datasets/ER.csv - Emotion recognition, used to detect the user's emotins based on their input.
 - Expected content.txt - This includes what sort of input is expected next.
