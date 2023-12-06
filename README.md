@@ -2,7 +2,7 @@
 
 # Joan 🤖 - Your smart assistant
 
-Welcome to `**Joan**`, a lightweight and resource-efficient smart assistant designed to run seamlessly on low-resource systems like Raspberry Pi. `**Joan**` leverages machine learning (scikit-learn) for speed and control, making it a user-friendly alternative to traditional chatbot frameworks. Unlike typical AI frameworks, `**Joan**` prioritizes transparency and simplicity for easy understanding.
+Welcome to **Joan**, a lightweight and resource-efficient smart assistant designed to run seamlessly on low-resource systems like Raspberry Pi. `**Joan**` leverages machine learning (scikit-learn) for speed and control, making it a user-friendly alternative to traditional chatbot frameworks. Unlike typical AI frameworks, `**Joan**` prioritizes transparency and simplicity for easy understanding.
 
 ## Features 🚀
 - Play a game (blackjack or rock paper scissors
