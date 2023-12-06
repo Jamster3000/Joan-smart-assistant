@@ -5,15 +5,31 @@
 Welcome to **Joan**, a lightweight and resource-efficient smart assistant designed to run seamlessly on low-resource systems like Raspberry Pi. **Joan** leverages machine learning (scikit-learn) for speed and control, making it a user-friendly alternative to traditional chatbot frameworks. Unlike typical AI frameworks, **Joan** prioritizes transparency and simplicity for easy understanding.
 
 ## Features 🚀
-- **Game Time:** Play blackjack or rock-paper-scissors.
+- **Game Time:** Play blackjack, rock-paper-scissors, or a number guessing game.
 - Ask it to open a specific video on `Youtube`
-- Tell a joke
-- Tell a riddle (doesn't give answer until you give up or guess)
-- Trivia (questions and answers)
-- Gives facts
-- Opens the wiki game for the user to play
-- Opens a random xkcd
+- **Entertainment:** **Joan** can tell jokes, riddles, trivia questions, and even gives facts and advice (Do not follow)
+- **open Websites:** Open's random [XKCD](https://xkcd.com/) With a random image; akinator and the wiki game.
+- **Wikihow:** Can search for wikihow articles and either read them to you or show you the webpage.
+- **news:** Gives the latest general and space based news.
+- **Passcode:** A Passcode can be set up. This can be used to confirm you asked for certain commands, such as a factory reset (e.g. "factory reset [passcode]")
+- **recipes:** Has built in dataset of recipes allowing you to ask for a specific one.
+- **Factory rest:** This will remove any data that it has collected from the user, but it still remembers what it has learned from **wolfram Alpha**
+- **weather:** Can ask for the current weather, what the weather will be like tomorrow or on a specific day.
+- **Time/date:** Can tell the time, full date, the day, the month, and the year.
+- **movie data:** can tell information about different movies.
+- **Security:** **Joan** can scan a website to determine whether it's safe, proceed with caution, or dangerous. you must have the website open or copy the URL of the website for this to work.
 
+### Memory
+It has a memory not for conversation but for remembering things for the user. This is still a work in progress and is very complex because there are so many things to take into account. This is being developed with specific memory issues in mind, such as **short term memory loss**. **Joan** can currently remember where you have put something, and to remind you of something. The command to ask **Joan** to remember something must start with the keyword `remember`
+
+For exmaple you can tell **joan** `remember I have put my keys in the bowl`, **Joan** will remember this and all you need to do to know where your keys are would be to ask `Where are my keys` Joan would instantly tell you that your keys are in the bowl.
+
+**Joan** can remember general things such as `remember that I need to check my email` **Joan** will remember this and set a background timer. This timer is set at a random time of anywhere between 900 and 2400 seconds. once the timer runs out the next time the user inputs something **Joan** will bring up everything it has been asked to remind the user, in this case to `check emails`. If the user inputs something in relation to meaning that they will do it later, **Joan** will still remember this and remind them again later. Otherwise **Joan** will forget about it.
+
+If you need reminding to turn the lights off before leaving the house for example, just ask **Joan** to remind you and when you say `bye` to **Joan** it will also remind you what you have asked it to. This goes similar to when you come back by saying `hello` or some other greeting.
+
+> [!NOTE]
+> In addition to all these features, there are also ***Easter Eggs*** Because I am a fan of them in programs 🥚
 
 ## API's and Services 🌐
 **Joan** integrates seamlessly with various APIs:
