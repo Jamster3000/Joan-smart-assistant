@@ -16,6 +16,8 @@ In addition to the machine leaning it also uses several different APIs and more 
 - api64.ipify - Get's the user's IP address.
 - ipapi - This is used to get the user's IP data, which includes their current location.
 
+> [!WARNING]
+> While in the development phase the API keys are visible in the code and can be used easily. Many of these API's have limited usage every `week/month`.
 
 ## Modules/libraries that are required to be installed:
 - Pandas
