@@ -20,13 +20,42 @@ Welcome to **Joan**, a lightweight and resource-efficient smart assistant design
 - **Security:** **Joan** can scan a website to determine whether it's safe, proceed with caution, or dangerous. you must have the website open or copy the URL of the website for this to work.
 
 ### Memory
-It has a memory not for conversation but for remembering things for the user. This is still a work in progress and is very complex because there are so many things to take into account. This is being developed with specific memory issues in mind, such as **short term memory loss**. **Joan** can currently remember where you have put something, and to remind you of something. The command to ask **Joan** to remember something must start with the keyword `remember`
+It has a memory not for conversation but for remembering things for the user. This is still a work in progress and is very complex because there are so many things to take into account. This is being developed with specific memory issues in mind, such as **short term memory loss**. **Joan** can currently **remember** where you have put something, and to remind you of something. The command to ask **Joan** to **remember** something must start with the keyword **remember**
 
-For exmaple you can tell **joan** `remember I have put my keys in the bowl`, **Joan** will remember this and all you need to do to know where your keys are would be to ask `Where are my keys` Joan would instantly tell you that your keys are in the bowl.
+For exmaple you can tell **joan** `remember I have put my keys in the bowl`, **Joan** will **remember** this and all you need to do to know where your keys are would be to ask `Where are my keys` Joan would instantly tell you that your keys are in the bowl.
 
-**Joan** can remember general things such as `remember that I need to check my email` **Joan** will remember this and set a background timer. This timer is set at a random time of anywhere between 900 and 2400 seconds. once the timer runs out the next time the user inputs something **Joan** will bring up everything it has been asked to remind the user, in this case to `check emails`. If the user inputs something in relation to meaning that they will do it later, **Joan** will still remember this and remind them again later. Otherwise **Joan** will forget about it.
+**Joan** can **remember** general things such as `remember that I need to check my email` **Joan** will **remember** this and set a background timer. This timer is set at a random time of anywhere between 900 and 2400 seconds. once the timer runs out the next time the user inputs something **Joan** will bring up everything it has been asked to remind the user, in this case to `check emails`. If the user inputs something in relation to meaning that they will do it later, **Joan** will still **remember** this and remind them again later. Otherwise **Joan** will forget about it.
 
 If you need reminding to turn the lights off before leaving the house for example, just ask **Joan** to remind you and when you say `bye` to **Joan** it will also remind you what you have asked it to. This goes similar to when you come back by saying `hello` or some other greeting.
+
+## Memory
+**Joan** possesses a memory feature designed not for conversation but for remembering crucial details on behalf of the user. This functionality is a work in progress, intricately crafted to address specific memory issues, including short-term memory loss.
+
+### How Memory Works
+**Command Keyword**: The memory feature requires commands to start with the keyword **remember**.
+
+### Example Usage:
+- To inform **Joan** about the location of your keys:
+      `remember I have put my keys in the bowl`
+
+- Inquiring about your keys later is as simple as asking,
+      `Where are my keys?` and **Joan** will promptly retrieve the information.
+
+- General reminders are also supported:
+      `remember that I need to check my email`
+  **Joan** sets a background timer, randomly ranging between 900 and 2400 seconds. Upon timer expiration, **Joan** reminds you during the next interaction.
+
+- Reminders persist even if you plan to perform a task later. For example, if you state:
+    `remember that I need to turn off the lights before leaving`
+  **Joan** will remind you at an appropriate time, ensuring you don't forget.
+
+### Quick Reference
+Here's a summary of commands for easy reference:
+
+- **To remember a location**: remember [details]
+- **To set a general reminder***: remember that [reminder]
+- **To ask about remembered details**: [question]
+This functionality is part of **Joan's** commitment to providing a helpful and adaptive user experience.
 
 > [!NOTE]
 > In addition to all these features, there are also ***Easter Eggs*** Because I am a fan of them in programs 🥚
