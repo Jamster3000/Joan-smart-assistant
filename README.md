@@ -23,7 +23,7 @@ Welcome to **Joan**, a lightweight and resource-efficient smart assistant design
 > In addition to all these features, there are also ***Easter Eggs*** Because I am a fan of them in programs 🥚
 
 
-## Memory
+## Memory 🧠
 **Joan** possesses a memory feature designed not for conversation but for remembering crucial details on behalf of the user. This functionality is a work in progress, intricately crafted to address specific memory issues, including short-term memory loss.
 
 ### How Memory Works
