@@ -2,10 +2,10 @@
 
 # Joan 🤖 - Your smart assistant
 
-Welcome to **Joan**, a lightweight and resource-efficient smart assistant designed to run seamlessly on low-resource systems like Raspberry Pi. `**Joan**` leverages machine learning (scikit-learn) for speed and control, making it a user-friendly alternative to traditional chatbot frameworks. Unlike typical AI frameworks, `**Joan**` prioritizes transparency and simplicity for easy understanding.
+Welcome to **Joan**, a lightweight and resource-efficient smart assistant designed to run seamlessly on low-resource systems like Raspberry Pi. **Joan** leverages machine learning (scikit-learn) for speed and control, making it a user-friendly alternative to traditional chatbot frameworks. Unlike typical AI frameworks, **Joan** prioritizes transparency and simplicity for easy understanding.
 
 ## Features 🚀
-- Play a game (blackjack or rock paper scissors
+- **Game Time:** Play blackjack or rock-paper-scissors.
 - Ask it to open a specific video on `Youtube`
 - Tell a joke
 - Tell a riddle (doesn't give answer until you give up or guess)
@@ -15,8 +15,9 @@ Welcome to **Joan**, a lightweight and resource-efficient smart assistant design
 - Opens a random xkcd
 
 
-## API's used:
-In addition to the machine leaning it also uses several different APIs and more to come. None of these used API's have been paied for as they are free or use a free tier. A list of API's that are used:
+## API's and Services 🌐
+**Joan** integrates seamlessly with various APIs:
+
 - Wolfram  Alpha - Used to respond to anything that `"Joan`" can't or doesn't have a response for. Joan saves the answer allowing it to do "Live Learning".
 - Accuweather - Used to get weather data from a location (The user doesn't need to give `"Joan"` their location, It just knows).
 - omdbapi - (Open Movie Database) API for getting data about movies, although Wolfram Alpha also knows information about movies.
@@ -30,7 +31,10 @@ In addition to the machine leaning it also uses several different APIs and more 
 > [!WARNING]
 > While in the development phase the API keys are visible in the code and can be used easily. Many of these API's have limited usage every `week/month`.
 
-## Modules/libraries that are required to be installed:
+## Prerequisites 🛠️
+
+Ensure the following libraries are installed:
+
 - Pandas
 - Scikit-learn
 - pywikihow
@@ -46,10 +50,11 @@ In addition to the machine leaning it also uses several different APIs and more 
 > [!NOTE]
 > Since this is being developed to run on devices such as a raspberry pi, the modules and libraries above should all install and work as expected, even on 32-bit system.
 
-## How To Use:
-To run this code open up `"Joan.py"` and run it, depending on your machine specs it should take anywhere from 3 (ish) to 5 seconds to import all the libraries and load and train the model.
 
-## "Responses.csv" Tags:
+## How To Use 🚀
+Run **Joan.py**, and within 3 to 5 seconds, you're ready to explore the capabilities.
+
+## **Response** Tags 🏷️
 <sub>Each tag is surrounded by "<" and ">"</sub>
 
 - user-name - can include the user's name
@@ -65,7 +70,7 @@ To run this code open up `"Joan.py"` and run it, depending on your machine specs
 - sure-name - the surename of the user
 
 
-## Data Files included:
+## Data Files 📂:
 - datasets/ET.csv - Entity tag, this is the main file for recognizing what the user has inputted.
 - datasets/ER.csv - Emotion recognition, used to detect the user's emotins based on their input.
 - Expected content.txt - This includes what sort of input is expected next.
