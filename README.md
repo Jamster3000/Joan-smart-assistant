@@ -67,6 +67,6 @@ To run this code open up `"Joan.py"` and run it, depending on your machine specs
 - responses.csv - A long list in each row containing different variations of outputs.
 - user data.csv - all the user's data for `Joan` to remember.
 
-![GitHub issues](https://img.shields.io/github/issues/jamster3000/Joan-smart-assistant)
+![GitHub issues](https://img.shields.io/github/jamster3000/Joan-smart-assistant/issues)
 ![Last Commit](https://img.shields.io/github/last-commit/jamster3000/Joan-smart-assistant)
 ![GitHub Stars](https://img.shields.io/github/stars/jamster3000/Joan-smart-assistant?style=social)![Code Size](https://img.shields.io/github/languages/code-size/jamster3000/Joan-smart-assistant)
