@@ -19,6 +19,9 @@ Welcome to **Joan**, a lightweight and resource-efficient smart assistant design
 - **movie data:** can tell information about different movies.
 - **Security:** **Joan** can scan a website to determine whether it's safe, proceed with caution, or dangerous. you must have the website open or copy the URL of the website for this to work.
 
+> [!NOTE]
+> In addition to all these features, there are also ***Easter Eggs*** Because I am a fan of them in programs 🥚
+
 
 ## Memory
 **Joan** possesses a memory feature designed not for conversation but for remembering crucial details on behalf of the user. This functionality is a work in progress, intricately crafted to address specific memory issues, including short-term memory loss.
@@ -50,7 +53,7 @@ Here's a summary of commands for easy reference:
 This functionality is part of **Joan's** commitment to providing a helpful and adaptive user experience.
 
 > [!NOTE]
-> In addition to all these features, there are also ***Easter Eggs*** Because I am a fan of them in programs 🥚
+> This feature is continually evolving to better serve users with diverse memory-related needs.
 
 ## API's and Services 🌐
 **Joan** integrates seamlessly with various APIs:
