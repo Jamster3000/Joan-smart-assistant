@@ -32,9 +32,15 @@ In addition to the machine leaning it also uses several different APIs and more 
 - pyautogui
 - word2number
 
+> [!NOTE]
+> Since this is being developed to run on devices such as a raspberry pi, the modules and libraries above should all install and work as expected, even on 32-bit system.
 
 ## How To Use:
 To run this code open up `"Joan.py"` and run it, depending on your machine specs it should take anywhere from 3 (ish) to 5 seconds to import all the libraries and load and train the model.
+
+
+## List Of Things Currently Possible With `Joan`:
+- 
 
 ## "Responses.csv" Tags:
 <sub>Each tag is surrounded by "<" and ">"</sub>
@@ -60,3 +66,7 @@ To run this code open up `"Joan.py"` and run it, depending on your machine specs
 - log.txt - Just logs basic background operations within Joan.
 - responses.csv - A long list in each row containing different variations of outputs.
 - user data.csv - all the user's data for `Joan` to remember.
+
+![GitHub issues](https://img.shields.io/github/issues/jamster3000/ImageSearch)
+![Last Commit](https://img.shields.io/github/last-commit/jamster3000/ImageSearch)
+![GitHub Stars](https://img.shields.io/github/stars/jamster3000/ImageSearch?style=social)![Code Size](https://img.shields.io/github/languages/code-size/jamster3000/ImageSearch)
