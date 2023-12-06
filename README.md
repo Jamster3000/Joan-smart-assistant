@@ -32,7 +32,7 @@ In addition to the machine leaning it also uses several different APIs and more 
 
 
 ## How To Use:
-To run this code open up `#0969DA`"Joan.py" and run it, depending on your machine specs it should take anywhere from 3 (ish) to 5 seconds to import all the libraries and load and train the model.
+To run this code open up `#0969DA "Joan.py"` and run it, depending on your machine specs it should take anywhere from 3 (ish) to 5 seconds to import all the libraries and load and train the model.
 
 ## "Responses.csv" Tags:
 <sub>Each tag is surrounded by "<" and ">"</sub>
