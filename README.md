@@ -19,7 +19,7 @@ Welcome to **Joan**, a lightweight and resource-efficient smart assistant design
 - **movie data:** can tell information about different movies.
 - **Security:** **Joan** can scan a website to determine whether it's safe, proceed with caution, or dangerous. you must have the website open or copy the URL of the website for this to work.
 
-### Memory
+## Memory
 It has a memory not for conversation but for remembering things for the user. This is still a work in progress and is very complex because there are so many things to take into account. This is being developed with specific memory issues in mind, such as **short term memory loss**. **Joan** can currently **remember** where you have put something, and to remind you of something. The command to ask **Joan** to **remember** something must start with the keyword **remember**
 
 For exmaple you can tell **joan** `remember I have put my keys in the bowl`, **Joan** will **remember** this and all you need to do to know where your keys are would be to ask `Where are my keys` Joan would instantly tell you that your keys are in the bowl.
