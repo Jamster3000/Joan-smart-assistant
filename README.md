@@ -18,6 +18,7 @@ In addition to the machine leaning it also uses several different APIs and more 
 
 
 ## "Responses.csv" Tags:
+<sub>Each tag is surrounded by "<" and ">"</sub>
 ᴱᵃᶜʰ ᵗᵃᵍ ᶦˢ ˢᵘʳʳᵒᵘⁿᵈᵉᵈ ᵇʸ < ᵃⁿᵈ >
 
 - user-name - can include the user's name
