@@ -31,7 +31,6 @@ In addition to the machine leaning it also uses several different APIs and more 
 - unsafe-scans - the amount of scans that returned as a dangerous website
 - food - food
 - sure-name - the surename of the user
-______________________________________________________________________________________________________________
 
 ## Data Files included:
 
@@ -42,6 +41,3 @@ ________________________________________________________________________________
 - log.txt - Just logs basic background operations within Joan.
 - responses.csv - A long list in each row containing different variations of outputs.
 - user data.csv - all the user's data for Joan to remember.
-
-______________________________________________________________________________________________________________
-  
