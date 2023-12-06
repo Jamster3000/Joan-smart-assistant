@@ -59,5 +59,5 @@ To run this code open up `"Joan.py"` and run it, depending on your machine specs
 - responses.csv - A long list in each row containing different variations of outputs.
 - user data.csv - all the user's data for `Joan` to remember.
 
-[] Test one
-[] test two
+- [ ] Test one
+- [ ] test two
