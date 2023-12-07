@@ -58,15 +58,15 @@ This functionality is part of **Joan's** commitment to providing a helpful and a
 ## API's and Services 🌐
 **Joan** integrates seamlessly with various APIs:
 
-- Wolfram  Alpha - Used to respond to anything that *Joan** can't or doesn't have a response for. **Joan** saves the answer allowing it to do "Live Learning".
-- Accuweather - Used to get weather data from a location (The user doesn't need to give **Joan** their location, It just knows).
-- omdbapi - (Open Movie Database) API for getting data about movies, although Wolfram Alpha also knows information about movies.
-- spaceflightnewsapi - Gets news about space flights and events in relation to it.
-- currentsapi - Gets general news which also contains keywords to each article allowing the user to filter news sources.
-- genderize - This is used to determine what gener the user is, this seems to work pretty well.
-- totalvirus - this is used to scan a website, whether that be the website that is open or a link that was last copied.
-- api64.ipify - Get's the user's IP address.
-- ipapi - This is used to get the user's IP data, which includes their current location.
+- **Wolfram  Alpha** - Used to respond to anything that **Joan** can't or doesn't have a response for. **Joan** saves the answer allowing it to do "Live Learning".
+- **Accuweather** - Used to get weather data from a location (The user doesn't need to give **Joan** their location, It just knows).
+- **omdbapi** - (Open Movie Database) API for getting data about movies, although Wolfram Alpha also knows information about movies.
+- **spaceflightnewsapi** - Gets news about space flights and events in relation to it.
+- **currentsapi** - Gets general news which also contains keywords to each article allowing the user to filter news sources.
+- **genderize** - This is used to determine what gener the user is, this seems to work pretty well.
+- **totalvirus** - this is used to scan a website, whether that be the website that is open or a link that was last copied.
+- **api64.ipify** - Get's the user's IP address.
+- **ipapi** - This is used to get the user's IP data, which includes their current location.
 
 > [!WARNING]
 > While in the development phase the API keys are visible in the code and can be used easily. Many of these API's have limited usage every `week/month`.
