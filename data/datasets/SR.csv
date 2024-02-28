@@ -1,8 +1,9 @@
 text,sentiment
-yes,positive
 okay,positive
 one more,positive
 few more,positive
+yes,positive
+yes please,positive
 continue,positive
 okay sure,positive
 next,positive
@@ -80,6 +81,7 @@ definitely no,negative
 nay,negative
 not at all my friend,negative
 alas no,negative
+no thank you,negative
 regretfully no,negative
 against my better judgment,negative
 I must decline,negative
