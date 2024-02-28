@@ -261,17 +261,20 @@ class chatbot_tools():
         with open('data/datasets/responses.csv', 'r', encoding='utf8') as f:
             reader = csv.reader(f)
 
-            matching_rows = [row[1:] for row in reader if row[0] == tag]
-            expected_context = matching_rows[0][:1]
-            matching_rows = matching_rows[0][1:]
-            if not matching_rows:
-                print('An error as occured and an output cannont be produced.')
+            try:
+                matching_rows = [row[1:] for row in reader if row[0] == tag]
+                expected_context = matching_rows[0][:1]
+                matching_rows = matching_rows[0][1:]
+                if not matching_rows:
+                    print('An error as occured and an output cannont be produced.')
             
-            random_output = random.choice(matching_rows)
+                random_output = random.choice(matching_rows)
 
-            chatbot_tools.open_file(filename='data/expected context.txt', file='w', text=expected_context[0])
+                chatbot_tools.open_file(filename='data/expected context.txt', file='w', text=expected_context[0])
             
-            return random_output
+                return random_output
+            except IndexError:
+                pass
 
 class text_tools():
     def first_to_third(input_string):
@@ -341,11 +344,21 @@ def check_internet():
     
 def get_ip_address():
     '''
-    Gets the user's device IP address
+    Gets the user's device IP address.
+    This used to use https://api64.ipify.org but that had a limit of 1000 requests
     '''
+    #import requests
+    #response = requests.get('https://api64.ipify.org?format=json').json()
+    #return response['ip']
+
     import requests
-    response = requests.get('https://api64.ipify.org?format=json').json()
-    return response['ip']
+
+    url = 'https://api.ipify.org'
+    response = requests.get(url)
+    ip = response.text
+    
+    return ip
+
 
 def get_location_key():
     '''
@@ -387,25 +400,17 @@ def get_ip_data():
     '''
     Gets data from the IP address including city and country the user's device is in
     '''
-    import requests
+    import ipinfo
     internet = check_internet()
     if internet == 0:
         ip_address = get_ip_address()#get the device ip address
-        response = requests.get(f'https://ipapi.co/{ip_address}/json/')#get data from the ip
+        handler = ipinfo.getHandler('')#no api key or token for limited info
+        details = handler.getDetails(ip_address)
+        city, country = details.city, details.country_name
         
-        if response.status_code == 200:
-            response = response.json()
-            city = response.get('city')#get the city
-            country = response.get('country_name')#get the country
-
-            chatbot_tools.write_user_data(city=city,country=country)#write city and country to user data
-
-            location_key = get_location_key()#get the location key for the city
-    
-            chatbot_tools.write_user_data(location_key=location_key)
-        elif response.status_code == 429:#this means that too many requests have been made in x time
-            #free tier used for https://ipapi.co/ 1000 in 24 hours 30,000 in a month
-            pass
+        chatbot_tools.write_user_data(city=city, country=country)#write city and country to user data
+        location_key = get_location_key()
+        chatbot_tools.write_user_data(location_key=location_key)
     else:
         pass
     
@@ -440,3 +445,11 @@ def recipe_by_title(title):
             except TypeError:
                 pass
     return None
+
+def write_to_log(text):
+    import datetime
+
+    current_time = datetime.datetime.now()
+
+    with open('data/log.txt', 'a') as a:
+        a.write(str(current_time) + ': ' + str(text) + '\n')

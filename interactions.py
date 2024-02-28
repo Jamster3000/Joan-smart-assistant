@@ -21,10 +21,12 @@ class games():
         user_data = chatbot_tools.get_user_data()
         bot_answer = random.choice(['Rock', 'Paper', 'Scissors'])
         user_answer = input('You can just say R for rock, P for paper, and S for scissors. Ready... Rock... Paper... Scissors... Shoot.')
-    
+        print("Bot answer: ", bot_answer)
+        print("user answer: ", user_answer)
+        print("bot letter: ", (bot_answer)[0].lower())
         while user_answer.lower() not in ['rock', 'paper', 'scissors', 'r', 'p', 's']:
             pass #invalid input
-        if user_answer.lower() == bot_answer:
+        if user_answer.lower() == bot_answer or user_answer.lower() == list(bot_answer)[0].lower():
             print(chatbot_tools.random_output('rps tie'))
         elif (
             (user_answer.lower() == 'rock' and bot_answer == 'scissors' or user_answer.lower() == 'r' and bot_answer == 'scissors') or
