@@ -65,7 +65,6 @@ This functionality is part of **Joan's** commitment to providing a helpful and a
 - **currentsapi** - Gets general news which also contains keywords to each article allowing the user to filter news sources.
 - **genderize** - This is used to determine what gener the user is, this seems to work pretty well.
 - **totalvirus** - this is used to scan a website, whether that be the website that is open or a link that was last copied.
-- **api64.ipify** - Get's the user's IP address.
 - **ipapi** - This is used to get the user's IP data, which includes their current location.
 
 > [!WARNING]
@@ -86,6 +85,7 @@ Ensure the following libraries are installed:
 - pyperclip
 - pyautogui
 - word2number
+- ipinfo
 
 > [!NOTE]
 > Since this is being developed to run on devices such as a raspberry pi, the modules and libraries above should all install and work as expected, even on 32-bit system.
