@@ -16,7 +16,6 @@ Welcome to **Joan**, a lightweight and resource-efficient smart assistant design
 - **Factory rest:** This will remove any data that it has collected from the user, but it still remembers what it has learned from **wolfram Alpha**
 - **weather:** Can ask for the current weather, what the weather will be like tomorrow or on a specific day.
 - **Time/date:** Can tell the time, full date, the day, the month, and the year.
-- **movie data:** can tell information about different movies.
 - **Security:** **Joan** can scan a website to determine whether it's safe, proceed with caution, or dangerous. you must have the website open or copy the URL of the website for this to work.
 
 > [!NOTE]
