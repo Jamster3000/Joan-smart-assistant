@@ -10,7 +10,7 @@ Welcome to **Joan**, a lightweight and resource-efficient smart assistant design
 - **Entertainment:** **Joan** can tell jokes, riddles, trivia questions, and even gives facts and advice (Do not follow)
 - **open Websites:** Open's random [XKCD](https://xkcd.com/) With a random image; akinator and the wiki game.
 - **Wikihow:** Can search for wikihow articles and either read them to you or show you the webpage.
-- **news:** Gives the latest general and space based news.
+- **news:** Can give the latest news articles
 - **Passcode:** A Passcode can be set up. This can be used to confirm you asked for certain commands, such as a factory reset (e.g. "factory reset [passcode]")
 - **recipes:** Has built in dataset of recipes allowing you to ask for a specific one.
 - **Factory rest:** This will remove any data that it has collected from the user, but it still remembers what it has learned from **wolfram Alpha**
