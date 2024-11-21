@@ -1,0 +1,36 @@
+{
+    "users": [
+        {
+            "new user": "false",
+            "first name": "Jamie",
+            "middle name": "",
+            "surname": "",
+            "dob": "",
+            "nickname": "",
+            "age": "",
+            "gender": "male",
+            "fix boredom": "",
+            "F-song": "",
+            "F-music genre": "",
+            "F-film": "",
+            "F-book": "",
+            "F-food": "",
+            "disliked food": [],
+            "disabilities": "",
+            "amount of pets": "",
+            "type of pets": "",
+            "name of pets": [],
+            "education": "",
+            "work": "",
+            "visited places": [],
+            "living location": "",
+            "news interest": [],
+            "news hate": [],
+            "city": "Birmingham",
+            "country": "United Kingdom",
+            "location key": "",
+            "band news site": "",
+            "hobbies": []
+        }
+    ]
+}
