@@ -270,7 +270,7 @@ def wikihow():
     print(chatbot_tools.random_output('wikihow random'))
     
 def factory_reset():
-    files_to_empty = ['expected context.txt', 'last time used.txt', 'log.txt', 'quiz difficulty.txt', 'user passcode.txt', 'wiki links.txt']  
+    files_to_empty = ['expected context.txt', 'last time used.txt', 'quiz difficulty.txt', 'user passcode.txt', 'wiki links.txt']  
 
     #make sure all txt data files are emptied
     for file in files_to_empty:
@@ -508,7 +508,7 @@ class movie():
                 
                     #usful data elements
                     try:
-                        title = data['Search'][0]['Title'].title()#TODO: This returns an error, need to deal with it
+                        title = data['Search'][0]['Title'].title()
                         year = data['Search'][0]['Year']
                         ID = data['Search'][0]['imdbID']
                         file_type = data['Search'][0]['Type']

@@ -1,7 +1,23 @@
-import csv, random, json, datetime
+#from gradio_client import Client #only needed if using hugging face spaces api
+import csv, random, json, datetime, requests, re
+from collections import Counter
 import pandas as pd
+from functools import lru_cache
 import nltk
 from nltk import RegexpParser, sent_tokenize, word_tokenize, pos_tag, Tree, ne_chunk
+from elevenlabs import Voice, VoiceSettings, play
+from elevenlabs.client import ElevenLabs
+#nltk.download('punkt_tab')
+#nltk.download('averaged_perceptron_tagger_eng')
+#nltk.download('maxent_ne_chunker_tab')
+#nltk.download('words')
+
+#files
+from mistral_Joan import *
+
+client = ElevenLabs(
+  api_key="af1726bdbe04b294ff49ba28316bbebb",
+)
 
 #finding food in text
 patterns="""
@@ -10,20 +26,42 @@ patterns="""
     {<NP><CC><NP>}
     {<RB><JJ>*<NN*>+}
     """
-NPChunker = RegexpParser(patterns)
+NPChunker = RegexpParser(patterns) 
     
 class process_text_tools():
-    def preprocess_text(text):
-        import re
+    def calculate_class_weights(y_train):
+        '''
+        calculates the class weights based on class frequencies
+        y_train: a list of class labesl for training data
+        '''
         
+        class_counts = Counter(y_train)
+        total_count = len(y_train)
+        class_weights = {label: total_count/(count *len(set(y_train))) for label, count in class_counts.items()}
+        
+        return class_weights
+    
+    def preprocess_text(text):
         text = text.lower()
         text = re.sub(r'[^\w\s]', '', text)
         return text
+    
+    def fix_json(json_string):
+        # Remove any extra characters and ensure JSON structure has the correct closing
+        json_string = json_string.strip()
+        
+        # Attempt to add a missing closing brace if not present
+        if not json_string.endswith("}"):
+            json_string += "}"
+            
+        # Look for common formatting issues and correct them
+        json_string = re.sub(r",\s*}", "}", json_string)  # Remove trailing commas before closing brace
+        json_string = re.sub(r",\s*\]", "]", json_string)  # Remove trailing commas before closing bracket
+        
+        return json_string
 
 class chatbot_tools():       
     def extract_website_name(url):
-        import re
-        
         pattern = re.compile(r'https?://([^/]+)')
         match = pattern.match(url)
         if match:
@@ -31,10 +69,11 @@ class chatbot_tools():
         else:
             return None
     
+    @staticmethod
+    @lru_cache(maxsize=None)
     def big_guns(user_input):
-        import requests
-        
-        print('Big guns running')
+        # This function is to use wolfram alpha.        
+        audio('Big guns running')
         user_data = chatbot_tools.get_user_data()
         response = requests.get(f'https://api.wolframalpha.com/v2/query?input={user_input.replace(" ", "+")}&format=plaintext&output=JSON&appid=E96E34-TYEKWH2QKL')
         if response.status_code == 200:
@@ -43,10 +82,10 @@ class chatbot_tools():
 
             try:
                 if data_type == 'Math':#if it's a maths question format the output
-                    print("The answer to your math question is: " + str(data['queryresult']['pods'][1]['subpods'][0]['plaintext']))
+                    audio("The answer to your math question is: " + str(data['queryresult']['pods'][1]['subpods'][0]['plaintext']))
                 else: #if not maths question just output result
                     answer = (data['queryresult']['pods'][1]['subpods'][0]['plaintext'])
-                    print(answer)
+                    audio(answer)
 
                     ET_pd = pd.read_csv('data/datasets/ET.csv')#load csv file
                     
@@ -55,8 +94,8 @@ class chatbot_tools():
                     ET_pd.loc[len(ET_pd)] = new_data
                     ET_pd.to_csv('data/datasets/ET.csv', index=False)
             except KeyError:
-                print(chatbot_tools.random_output('Unable to respond').replace('<user-name>', user_data['first name']))
-
+                audio(chatbot_tools.random_output('Unable to respond').replace('<user-name>', user_data['first name']))
+           
     def day_to_date(target_day):
         # Define a dictionary to map day names to corresponding integers
         day_to_int = {
@@ -69,19 +108,10 @@ class chatbot_tools():
             "sunday": 6,
         }
 
-        # Get the current date
         current_date = datetime.datetime.now()
-
-        # Calculate the current day of the week (0 for Monday, 1 for Tuesday, etc.)
         current_day = current_date.weekday()
-
-        # Calculate the number of days to the target day
         days_to_target_day = (day_to_int[target_day.lower()] - current_day) % 7
-
-        # Calculate the date for the upcoming target day
         next_target_day = current_date + datetime.timedelta(days=days_to_target_day)
-
-        # Format the date in the desired format (e.g., 'YYYY-MM-DD')
         formatted_date = next_target_day.strftime('%Y-%m-%d')
 
         return formatted_date
@@ -120,129 +150,199 @@ class chatbot_tools():
         except ValueError:
             return 'unknown'
         
-    def write_user_data(first_name="",middle_name="",surname="",dob="",nickname="",age="",gender="",interests="",fix_boredom="",f_song="",f_music_genre="",f_film="",f_book="",f_food="",dislike_food="",disability="",
-                        pet_amount="",type_pet="",name_pet="",education="",work="",visited_places="",living_place='',news_interest="",news_hate="",city='',country='', location_key='', band_news_site=''):
-
-        file_path = 'data/user data.csv'
-        data = []
-        with open(file_path, mode='r', newline='') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                data.append(row)
+    @staticmethod
+    @lru_cache(maxsize=None)
+    def write_user_data(new_user="", first_name="", middle_name="", surname="", dob="", nickname="", age="", gender="",
+                        hobby="", fix_boredom="", f_song="", f_music_genre="", f_film="", f_book="", 
+                        f_food="", dislike_food="", disability="", pet_amount="", type_pet="", name_pet="",
+                        education="", work="", visited_places="", living_place='', news_interest="", 
+                        news_hate="", city='', country='', location_key='', band_news_site=''):
         
-        if first_name != '':
-            data[0]['first name'] = first_name
-        if middle_name != '':
-            data[0]['middle name'] = middle_name
-        if surname != '':
-            data[0]['surname'] = surname
-        if dob != '':
-            data[0]['dob'] = dob
-        if nickname != '':
-            data[0]['nickname'] = nickname
-        if age != '':
-            data[0]['age'] = age
-        if gender != '':
-            data[0]['gender'] = gender
-        if interests != '':
-            data[0]['interests/hobbies'] = interests
-        if fix_boredom != '':
-            data[0]['fix bordem'] = fix_boredom
-        if f_song != '':
-            data[0]['F-song'] = f_song
-        if f_music_genre != '':
-            data[0]['F-music genre'] = f_music_genre
-        if f_film != '':
-            data[0]['F-film'] = f_film
-        if f_book != '':
-            data[0]['F-book'] = f_book
-        if f_food != '':
-            data[0]['F-food'] = f_food
-        if dislike_food != '':
-            data[0]['disliked food'] = dislike_food
-        if disability != '':
-            data[0]['disabilities'] = disability
-        if pet_amount != '':
-            data[0]['amount of pets'] = pet_amount
-        if type_pet != '':
-            data[0]['type of pets'] = type_pet
-        if name_pet != '':
-            data[0]['name of pets'] = name_pet
-        if education != '':
-            data[0]['education'] = education
-        if work != '':
-            data[0]['work'] = work
-        if visited_places != '':
-            data[0]['visited places'] = visited_places
-        if living_place != '':
-            data[0]['living location'] = living_place
-        if news_interest != '':
-            data[0]['news interest'] = news_interest
-        if news_hate != '':
-            data[0]['news hate'] += ', ' + news_hate
-        if city != '':
-            data[0]['city'] = city
-        if country != '':
-            data[0]['country'] = country
-        if location_key != '':
-            data[0]['location key'] = location_key
-        if band_news_site != '':
-            data[0]['band news site'] += ', ' + band_news_site
+        file_path = 'data/user_data.json'  # Update the file path to point to your JSON file
+        
+        # Read the existing data
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {"users": [{}]}  # Initialize a default structure if the file doesn't exist or is empty
+        
+        # Ensure we have a user at index 0
+        user_data = data["users"][0] if data.get("users") else {}
+        
+        # Update user data with provided values
+        user_data.update({
+            "new user": new_user if new_user else user_data.get("new user", "false"),
+            "first name": first_name or user_data.get("first name", ""),
+            "middle name": middle_name or user_data.get("middle name", ""),
+            "surname": surname or user_data.get("surname", ""),
+            "dob": dob or user_data.get("dob", ""),
+            "nickname": nickname or user_data.get("nickname", ""),
+            "age": age or user_data.get("age", ""),
+            "gender": gender or user_data.get("gender", ""),
+            "fix boredom": fix_boredom or user_data.get("fix boredom", ""),
+            "F-song": f_song or user_data.get("F-song", ""),
+            "F-music genre": f_music_genre or user_data.get("F-music genre", ""),
+            "F-film": f_film or user_data.get("F-film", ""),
+            "F-book": f_book or user_data.get("F-book", ""),
+            "F-food": f_food or user_data.get("F-food", ""),
+            "disliked food": user_data.get("disliked food", []),
+            "disabilities": disability or user_data.get("disabilities", ""),
+            "amount of pets": pet_amount or user_data.get("amount of pets", ""),
+            "type of pets": type_pet or user_data.get("type of pets", ""),
+            "name of pets": user_data.get("name of pets", []),
+            "education": education or user_data.get("education", ""),
+            "work": work or user_data.get("work", ""),
+            "visited places": user_data.get("visited places", []),
+            "living location": living_place or user_data.get("living location", ""),
+            "news interest": user_data.get("news interest", []),
+            "news hate": user_data.get("news hate", []),
+            "city": city or user_data.get("city", ""),
+            "country": country or user_data.get("country", ""),
+            "location key": location_key or user_data.get("location key", ""),
+            "band news site": user_data.get("band news site", "")
+        })
 
-        with open(file_path, mode='w', newline='') as file:
-            fieldnames = data[0].keys()
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
+        # Handle appending multiple disliked food, names of pets, visited places, news interest, and news hate
+        if dislike_food:
+            food_data = user_data['disliked food']
+            food_list = [food.strip() for food in dislike_food.split(',')]
+            user_data['disliked food'] = list(set(food_data + food_list))
 
-            writer.writeheader()
-            writer.writerow(data[0])
+        if visited_places:
+            visit_data = user_data['visited places']
+            visit_list = [place.strip() for place in visited_places.split(',')]
+            user_data['visited places'] = list(set(visit_data + visit_list))
 
+        if news_interest:
+            interest_data = user_data['news interest']
+            interest_list = [news.strip() for news in news_interest.split(',')]
+            user_data['news interest'] = list(set(interest_data + interest_list))
+
+        if news_hate:
+            hate_data = user_data['news hate']
+            hate_list = [news.strip() for news in news_hate.split(',')]
+            user_data['news hate'] = list(set(hate_data + hate_list))
+
+        # Handle hobby data generation
+        if hobby:
+            # Check if the hobby already exists
+            hobby_data = user_data.get('hobbies', [])
             
-    def get_user_data():      
-        pd.set_option('display.max_colwidth', None)
-        user_data = pd.read_csv('data/user data.csv', )
+            duplicate_found = any(
+                item.get("hobby", "").strip().lower() == hobby.strip().lower() for item in user_data["hobbies"]
+            )
 
-        #user info from csv file
-        index = user_data['index'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        first_name = user_data['first name'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        middle_name = user_data['middle name'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        surename = user_data['surname'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        dob = user_data['dob'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        nickname = user_data['nickname'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        age = user_data['age'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        gender = user_data['gender'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        interests_hobbies = user_data['interests/hobbies'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        fix_bordem = user_data['fix bordem'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        F_song = user_data['F-song'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        F_song_genre = user_data['F-music genre'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        F_food = user_data['F-food'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        F_book = user_data['F-book'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        F_film = user_data['F-film'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        disliked_food = user_data['disliked food'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        disabilities = user_data['disabilities'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        amount_of_pets = user_data['amount of pets'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        name_of_pets = user_data['name of pets'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        type_of_pets = user_data['type of pets'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        education = user_data['education'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        work = user_data['work'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        visited_places = user_data['visited places'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        living_location = user_data['living location'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        news_interest = user_data['news interest'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        news_hate = user_data['news hate'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        city = user_data['city'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '').replace('0', '')
-        country = user_data['country'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        location_key = user_data['location key'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
-        band_news_site = user_data['band news site'].to_string().replace('0    ', '').replace('Series([], )', '').replace('0   NaN', '').replace('   NaN', '')
+            if duplicate_found:
+                return
 
-        memory_data = {'index': index,'first name': first_name,'middle name': middle_name,'surename': surename,
-                       'dob': dob,'nickname': nickname,'age': age,'gender': gender,
-                       'hobbies/interest': interests_hobbies,'fix bordem': fix_bordem,'favourite song': F_song,
-                       'favoute music genre': F_song_genre,'favourite book': F_book,'favourite film': F_film,
-                       'favourite food': F_food,'disliked food': disliked_food,'disabilities': disabilities,
-                       'number of pets': amount_of_pets,'name of pets': name_of_pets,'type of pets': type_of_pets,
-                       'education': education,'work': work,'places visited': visited_places,'living location': living_location,
-                       'news interest': news_interest,'news hate': news_hate,'city':city, 'country':country,
-                       'location key':location_key, 'band news site': band_news_site}
+            # Retry mechanism for generating hobby data
+            #generated_data = generate(f"Provide a simple, informative JSON structure about the hobby '{hobby}' Include: description as a concise explanation of what the hobby involves, type as the category of this hobby (e.g., 'musical instrument'), and the skill level of this hobby (easy, medium, hard). Keep the description strictly relevant, clear, and avoid unrelated details or filler words.").replace('</s>', '')
+            #print("=====\n", generated_data, "\n=====")
+
+            generated_data = generate(
+                f"Provide a JSON structure for the hobby '{hobby}' in the following format:\n\n"
+                f"{{\n"
+                f"    \"hobby\": \"{hobby}\",\n"
+                f"    \"description\": \"[A concise explanation of what the hobby involves]\",\n"
+                f"    \"type\": \"[Category of the hobby, e.g., 'Visual Art']\",\n"
+                f"    \"skill_level\": \"[Skill level required: Easy, Medium, Hard]\"\n"
+                f"}}\n\n"
+                "Ensure the JSON structure is valid, and replace only the placeholder descriptions and values in brackets with actual details relevant to the hobby."
+            )
+
+            print(generated_data)#***
+
+            # Clean the generated data
+            cleaned_data = chatbot_tools.clean_json_data(generated_data)
+
+            try:
+                # Attempt to load the cleaned JSON data
+                hobby_data = json.loads(cleaned_data)
+
+                # Ensure hobby_data is a dictionary
+                if isinstance(hobby_data, dict):
+                    # Ensure 'hobbies' key exists
+                    if 'hobbies' not in user_data:
+                        user_data['hobbies'] = []
+
+                    # Append the new hobby data
+                    user_data['hobbies'].append(hobby_data)
+                else:
+                    print("Generated hobby data is not a valid dictionary.")
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON for hobby: {e} - Data: {cleaned_data.strip()}")
+
+        # Ensure the users list contains the updated user_data
+        if "users" in data and data["users"]:
+            data["users"][0] = user_data
+        else:
+            data["users"] = [user_data]
+
+        # Write the updated data back to the JSON file
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+
+    @staticmethod
+    def clean_json_data(json_data):
+        """
+        Clean the generated JSON data by removing newlines, non-printable characters, and formatting it.
+        """
+        cleaned_data = re.sub(r'[\r\n]+', '', json_data)  # Remove newlines
+        cleaned_data = re.sub(r'[^\x20-\x7E]+', '', cleaned_data)  # Remove non-printable characters
+        cleaned_data = re.sub(r'^\s*{', '{', cleaned_data)  # Remove leading whitespace before '{'
+        cleaned_data = re.sub(r'\s*}$', '}', cleaned_data)  # Remove trailing whitespace after '}'
+        cleaned_data = re.sub(r',\s*', ', ', cleaned_data)  # Add a single space after commas
+        return cleaned_data
+
+    @staticmethod
+    @lru_cache(maxsize=None)
+    def get_user_data():
+        file_path = 'data/user_data.json'
+        try:
+            with open(file_path, 'r') as f:
+                user_data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return {}  # Return empty dict if file does not exist or is unreadable
+
+        # Access the user data within the "users" array
+        user_info = user_data.get("users", [{}])[0]
         
+        # Return both user-specific and top-level data
+        memory_data = {
+            'index': user_info.get('index', ''),
+            'new user': user_info.get('new user', ''),
+            'first name': user_info.get('first name', ''),
+            'middle name': user_info.get('middle name', ''),
+            'surname': user_info.get('surname', ''),
+            'dob': user_info.get('dob', ''),
+            'nickname': user_info.get('nickname', ''),
+            'age': user_info.get('age', ''),
+            'gender': user_info.get('gender', ''),
+            'hobby': user_info.get('hobby', {}),
+            'fix boredom': user_info.get('fix boredom', ''),
+            'favourite song': user_info.get('F-song', ''),
+            'favourite music genre': user_info.get('F-music genre', ''),
+            'favourite food': user_info.get('F-food', ''),
+            'favourite book': user_info.get('F-book', ''),
+            'favourite film': user_info.get('F-film', ''),
+            'disliked food': user_info.get('disliked food', ''),
+            'disabilities': user_info.get('disabilities', ''),
+            'number of pets': user_info.get('amount of pets', ''),
+            'name of pets': user_info.get('name of pets', ''),
+            'type of pets': user_info.get('type of pets', ''),
+            'education': user_info.get('education', ''),
+            'work': user_info.get('work', ''),
+            'places visited': user_info.get('visited places', ''),
+            'living location': user_info.get('living location', ''),
+            'news interest': user_info.get('news interest', ''),
+            'news hate': user_info.get('news hate', ''),
+            'city': user_data.get('city', ''),
+            'country': user_data.get('country', ''),
+            'location key': user_data.get('location key', ''),
+            'band news site': user_info.get('band news site', '')
+        }
+
         return memory_data
     
     def open_file(filename, file='r', text=None):
@@ -256,45 +356,34 @@ class chatbot_tools():
                     f.write(text)
         except FileNotFoundError:
             raise FileNotFoundError
-        
+                
     def random_output(tag):
-        with open('data/datasets/responses.csv', 'r', encoding='utf8') as f:
-            reader = csv.reader(f)
-
-            try:
-                matching_rows = [row[1:] for row in reader if row[0] == tag]
-                expected_context = matching_rows[0][:1]
-                matching_rows = matching_rows[0][1:]
-                if not matching_rows:
-                    print('An error as occured and an output cannont be produced.')
+        try:
+            df = pd.read_csv("data/datasets/responses.csv", encoding="utf-8")
+        
+            # find the matching row to the tag
+            matching_rows = df[df["ET"] == tag]
             
-                random_output = random.choice(matching_rows)
-
-                chatbot_tools.open_file(filename='data/expected context.txt', file='w', text=expected_context[0])
+            if matching_rows.empty:
+                raise ValueError(f"No matching rows found for tag: {tag}")
             
-                return random_output
-            except IndexError:
-                pass
+            expected_context = matching_rows.iloc[0, 1]
+            responses = matching_rows.iloc[0, 2:].dropna().tolist()
+            
+            if not responses:
+                raise ValueError("No responses foudn for the given tag")
+            
+            random_response = random.choice(responses)
+            print(expected_context)
+            with open("data/expected context.txt", 'w') as f:
+                f.write(expected_context)
+                
+            return random_response
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return "An error has occurred and an output cannot be produced"
 
 class text_tools():
-    def first_to_third(input_string):
-        # Split the input string into words
-        words = input_string.replace('remember ', '').split()
-
-        # Define a dictionary to map first-person pronouns to third-person pronouns
-        pronoun_mapping = {
-            'i': 'you', 'my': 'your', 'me': 'you', 'myself': 'yourself'}
-
-        # Iterate through the words and replace first-person pronouns
-        for i in range(len(words)):
-            if words[i] in pronoun_mapping:
-                words[i] = pronoun_mapping[words[i]]
-
-        # Join the words back into a string
-        output_string = ' '.join(words)
-
-        return output_string
-
     def prepare_text(text):
         sentences = sent_tokenize(text)#nltk
         sentences = [word_tokenize(sent) for sent in sentences]#nltk 
@@ -307,7 +396,7 @@ class text_tools():
         nps = []
         for sent in sentences:
             tree = NPChunker.parse(sent)
-            #print(tree)
+            #audio(tree)
             for subtree in tree.subtrees():
                 if subtree.label() == 'NP':
                     t = subtree
@@ -332,7 +421,22 @@ class text_tools():
             return text_tools.sent_parse(text).replace('-', '').replace("favoutie food is ", '')
         else:
             return text_tools.sent_parse(singular_word).replace('-', '').replace("favoutie food is ")
-        
+      
+def audio(text):
+    try:    
+        audio = client.generate(
+                text = text,
+                model="eleven_multilingual_v2",
+                voice=Voice(
+                voice_id='r1E4x9gdvKI4ah2XK8th',
+                settings=VoiceSettings(stability=0.55, similarity_boost=0.2, style=0.35, use_speaker_boost=True)            
+            )
+        )
+    
+        play(audio)
+    except Exception as e:
+        print(text)
+
 def check_internet():
     try:
         import requests
@@ -403,14 +507,17 @@ def get_ip_data():
     import ipinfo
     internet = check_internet()
     if internet == 0:
-        ip_address = get_ip_address()#get the device ip address
-        handler = ipinfo.getHandler('')#no api key or token for limited info
-        details = handler.getDetails(ip_address)
-        city, country = details.city, details.country_name
-        
-        chatbot_tools.write_user_data(city=city, country=country)#write city and country to user data
-        location_key = get_location_key()
-        chatbot_tools.write_user_data(location_key=location_key)
+        try:
+            ip_address = get_ip_address()#get the device ip address
+            handler = ipinfo.getHandler('')#no api key or token for limited info
+            details = handler.getDetails(ip_address)
+            city, country = details.city, details.country_name
+            
+            chatbot_tools.write_user_data(city=city, country=country)#write city and country to user data
+            location_key = get_location_key()
+            chatbot_tools.write_user_data(location_key=location_key)
+        except Exception as e:
+            print(f"An error occurred: {e}")
     else:
         pass
     
@@ -433,7 +540,7 @@ def get_copied_text():
 
 def recipe_by_title(title):
     title = title.lower().rstrip().lstrip().replace('&', 'and')
-    with open('data/datasets/recipies/json', 'r') as json_file:
+    with open('data/datasets/recipies.json', 'r') as json_file:
         data_list = json.load(json_file)
         
         for data_dict in data_list:
@@ -446,10 +553,10 @@ def recipe_by_title(title):
                 pass
     return None
 
-def write_to_log(text):
-    import datetime
 
-    current_time = datetime.datetime.now()
+#Ask the user for their hobby
+#chatbot_tools.write_user_data.cache_clear()
+#chatbot_tools.get_user_data.cache_clear()
 
-    with open('data/log.txt', 'a') as a:
-        a.write(str(current_time) + ': ' + str(text) + '\n')
+#chatbot_tools.write_user_data(hobby='dancing')
+

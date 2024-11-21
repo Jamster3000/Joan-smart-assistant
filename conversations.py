@@ -65,25 +65,13 @@ class how_are_you_response():
         
     def suggest_food():
         suggest_meal()
-        '''user_data = chatbot_tools.get_user_data()
-
-        if user_data['favourite food'] == '':
-            print(chatbot_tools.random_output('unknown fix hunger').replace('<user-name>', user_data['first name']))
-        else:
-            print(chatbot_tools.random_output('fix hunger').replace('<F-food>', user_data['favourite food']).replace('<user-name>', user_data['first name']))
-        
-        return None'''
 
 def greeting_response(user_input):
     current_hour = datetime.datetime.now().hour
     
     users_name = ''
-    #read user data for name
-    with open('data/user data.csv', 'r') as file:
-        reader = csv.reader(file)
-        next(reader)
-        for row in reader:
-            users_name = row[1]
+    user_data = chatbot_tools.get_user_data()
+    users_name = user_data['first name']
             
     if 'morning' in user_input.lower():
         print(chatbot_tools.random_output('morning greeting').replace('<user-name>', users_name))
