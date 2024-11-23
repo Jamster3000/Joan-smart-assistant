@@ -58,7 +58,24 @@ def log_execution_time(func):
 
 class models():
     @log_execution_time       
-    def process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier):        
+    def process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier):
+        """
+        process_input
+        --------------
+            Processes the user's input, cleaning it, and using various different functions to determine how to respond accurately. If no appropiate response is found, then it relised on the big guns function, which uses external online A.I. sources, such as a small and fast Mistral model or wolfram alpha.
+
+        Parameters
+        --------------
+        - user_input (str): The user's input to process
+        - vectorizer
+        - classifier
+        - er_vectorizer
+        - er_classifier
+
+        Returns
+        -------------
+        None: This procedure doesn't return a value.
+        """
         with open('data/expected context.txt', 'r') as f:
             context = f.read()
 
