@@ -60,22 +60,20 @@ class models():
     @log_execution_time       
     def process_input(user_input, vectorizer, classifier, er_vectorizer, er_classifier):
         """
-        process_input
-        --------------
-            Processes the user's input, cleaning it, and using various different functions to determine how to respond accurately. If no appropiate response is found, then it relised on the big guns function, which uses external online A.I. sources, such as a small and fast Mistral model or wolfram alpha.
-
-        Parameters
-        --------------
-        - user_input (str): The user's input to process
-        - vectorizer
-        - classifier
-        - er_vectorizer
-        - er_classifier
-
-        Returns
-        -------------
-        None: This procedure doesn't return a value.
+        Processes the user's input, cleans it, and uses different functions to respond accurately.
+        If no appropriate response is found, it relies on external AI sources like Mistral or Wolfram Alpha.
+        
+        Args:
+            user_input (str): The user's input to process.
+            vectorizer (TfidfVectorizer): The vectorizer used to transform text data.
+            classifier (LinearSVC): The classifier used to predict user input classification.
+            er_vectorizer (TfidfVectorizer): The vectorizer for emotion recognition.
+            er_classifier (SVC): The classifier for emotion recognition.
+        
+        Returns:
+            None: This function does not return a value, it handles user interaction and context.
         """
+        
         with open('data/expected context.txt', 'r') as f:
             context = f.read()
 
@@ -127,8 +125,23 @@ class models():
 
     @log_execution_time
     def find_intent(user_input, ET_data):
+        """
+        find_intent:
+            Compares the user's input (string) to the entity tagging data it has in the ET.csv file.
+            Uses fuzzywuzzy to find the best match to the user's input.
+
+        Parameters
+        -------------
+        - user_input (str): The user's input
+        - ET_data (pandas DataFrame): A dataframe for pandas to use effeciently.
+
+        Returns
+        -------------
+        str : Empty string or match[0] (the match with highest score).
+        """
+        
         try:
-            user_inpuit = user_input.lower()
+            user_input = user_input.lower()
             ET_data = ET_data.iloc[ET_data['name'].str.len().argsort()]
             ET_data.set_index('name', inplace=True)
         
@@ -145,6 +158,22 @@ class models():
     @lru_cache(maxsize=None)
     @log_execution_time
     def preprocess_data():
+        """
+        preprocess_data:
+            Reads all the data models (if they exist), and other data files into memory.
+            Trains Machine Learning models on the data in memory.
+
+        Parameters
+        --------------
+        None: Doesn't accept any parameters
+
+        Returns
+        ---------------
+        TfidfVectorizer: For the vector and er_vector
+        LinearSVC: The classifier
+        SVC: The er_classifier
+        """
+        
         # Check if models are already saved
         try:
             vectorizer = joblib.load('Models/vectorizer.joblib')
