@@ -55,6 +55,7 @@ def log_execution_time(func):
 
     Return:
         - callable: The wrapped function with execution time logging added.
+    """
     @wraps(func)
     def wraper(*args, **kwargs):
         start_time = time.time()
