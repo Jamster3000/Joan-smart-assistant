@@ -46,6 +46,15 @@ get_ip_data()
 #decorator for logging the execution time of a function
 # this is still new to me this feature of python  
 def log_execution_time(func):
+    """
+    A decorator mesaures how long a function takes to execute and logs the duration in seconds using the `logging` module.
+    It is useful for performance monitoring and debugging
+
+    Args:
+        - func (callable): The function to be wrapped and timed.
+
+    Return:
+        - callable: The wrapped function with execution time logging added.
     @wraps(func)
     def wraper(*args, **kwargs):
         start_time = time.time()
@@ -64,14 +73,14 @@ class models():
         If no appropriate response is found, it relies on external AI sources like Mistral or Wolfram Alpha.
         
         Args:
-            user_input (str): The user's input to process.
-            vectorizer (TfidfVectorizer): The vectorizer used to transform text data.
-            classifier (LinearSVC): The classifier used to predict user input classification.
-            er_vectorizer (TfidfVectorizer): The vectorizer for emotion recognition.
-            er_classifier (SVC): The classifier for emotion recognition.
+            - user_input (str): The user's input to process.
+            - vectorizer (TfidfVectorizer): The vectorizer used to transform text data.
+            - classifier (LinearSVC): The classifier used to predict user input classification.
+            - er_vectorizer (TfidfVectorizer): The vectorizer for emotion recognition.
+            - er_classifier (SVC): The classifier for emotion recognition.
         
         Returns:
-            None: This function does not return a value, it handles user interaction and context.
+            - None: This function does not return a value, it handles user interaction and context.
         """
         
         with open('data/expected context.txt', 'r') as f:
@@ -126,18 +135,15 @@ class models():
     @log_execution_time
     def find_intent(user_input, ET_data):
         """
-        find_intent:
-            Compares the user's input (string) to the entity tagging data it has in the ET.csv file.
-            Uses fuzzywuzzy to find the best match to the user's input.
+        Compares the user's input (string) to the entity tagging data it has in the ET.csv file.
+        Uses fuzzywuzzy to find the best match to the user's input.
 
-        Parameters
-        -------------
-        - user_input (str): The user's input
-        - ET_data (pandas DataFrame): A dataframe for pandas to use effeciently.
+        Args:
+            - user_input (str): The user's input
+            - ET_data (pandas DataFrame): A dataframe for pandas to use effeciently.
 
-        Returns
-        -------------
-        str : Empty string or match[0] (the match with highest score).
+        Returns:
+            - str : Empty string or match[0] (the match with highest score).
         """
         
         try:
@@ -159,19 +165,18 @@ class models():
     @log_execution_time
     def preprocess_data():
         """
-        preprocess_data:
-            Reads all the data models (if they exist), and other data files into memory.
-            Trains Machine Learning models on the data in memory.
-
-        Parameters
-        --------------
-        None: Doesn't accept any parameters
-
-        Returns
-        ---------------
-        TfidfVectorizer: For the vector and er_vector
-        LinearSVC: The classifier
-        SVC: The er_classifier
+        Reads all the data models (if they exist), and other data files into memory.
+        Trains Machine Learning models on the data in memory.
+    
+        Args:
+            None: Doesn't accept any parameters.
+    
+        Returns:
+            tuple:
+                - TfidfVectorizer: The vectorizer for sentiment analysis.
+                - LinearSVC: The sentiment classifier.
+                - TfidfVectorizer: The vectorizer for emotion recognition.
+                - SVC: The emotion recognition classifier.
         """
         
         # Check if models are already saved
@@ -230,6 +235,17 @@ class models():
     @lru_cache(maxsize=None)
     @log_execution_time
     def find_matched_keywords(user_input, vectorizer, threshold=0.7):
+        """
+        Uses the user's input to find their input with the data in the vectorizer
+
+        Args:
+            - user_input (str): the user's inputted text
+            - vectorizer (TfidfVectorizer): The vectorizer used to transform text data
+            - Threshold (float optional): The threshold to determine how close the user_input has to be to a keyword. Defaults to 0.7.
+
+        Returns:
+            - (str): string of the closest matching keyword or the user_input if no keyword matching was found.
+        """
         try:
             keywords = ET_data.iloc[:, 0].tolist()
 
