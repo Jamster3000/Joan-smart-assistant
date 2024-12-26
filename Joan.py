@@ -29,7 +29,7 @@ from conversations import *
 from interactions import *
 
 #empties expected context file
-chatbot_tools.open_file('data/expected context.txt', file='w', text='')
+chatbot_tools.open_file('Data/expected context.txt', file='w', text='')
 
 #configure the logging
 logging.basicConfig(
