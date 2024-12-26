@@ -53,8 +53,10 @@ Ensure the following libraries are installed:
 - pyautogui
 - word2number
 - ipinfo
+- elevenlabs
+- huggingface_hub
 
-`pip3 install pandas, scikit-learn pywikihow joblib youtube-search-python nltk inflect fuzzywuzzy requests pyperclip pyautogui word2number ipinfo`
+`pip3 install pandas, scikit-learn pywikihow joblib youtube-search-python nltk inflect fuzzywuzzy requests pyperclip pyautogui word2number ipinfo elevenlabs huggingface_hub`
 
 > [!NOTE]
 > Since this is being developed to run on devices such as a raspberry pi, the modules and libraries above should all install and work as expected, even on 32-bit system.
